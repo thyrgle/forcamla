@@ -1,6 +1,0 @@
-description = ""
-requires = ""
-archive(byte) = "forcamla.cma"
-archive(native) = "forcamla.cmxa"
-plugin(byte) = "forcamla.cma"
-plugin(native) = "forcamla.cmxs"
