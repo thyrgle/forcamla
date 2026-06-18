@@ -28,5 +28,6 @@ let test_term_form_expr = (check int) "same int" 6 (int_of_formula w)
 
 let _ = x =:: (x + it 1)
 
+let test_simple_inc = (check int) "same int" 3 (int_of_formula x)
 let test_complex_update = (check int) "same int" 9 (int_of_formula z)
 let test_term_from_expr = (check int) "same int" 12 (int_of_formula w)
