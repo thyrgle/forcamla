@@ -5,11 +5,11 @@
 (generate_opam_files true)
 
 (source
- (github username/reponame))
+ (github thyrgle/forcamla))
 
-(authors "Author Name <author@example.com>")
+(authors "Christopher Sumnicht <csumnicht@berkeley.edu>")
 
-(maintainers "Maintainer Name <maintainer@example.com>")
+(maintainers "Christopher Sumnicht <csumnicht@berkeley.edu>")
 
 (license LICENSE)
 
@@ -17,10 +17,8 @@
 
 (package
  (name forcamla)
- (synopsis "A short synopsis")
- (description "A longer description")
+ (synopsis "Organize program execution via formulae")
+ (description "Formulas are either terms or compound statements (terms combined with binary operators). Terms may be updated and then compound statements will reflect the changed updated terms. With this event listeners can be constructed that wait for formulas to be satisfied, changed, etc.")
  (depends ocaml)
  (tags
-  ("add topics" "to describe" your project)))
-
-; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html
+  ("mathematical programming" "formula" "event listeners")))
