@@ -1,0 +1,17 @@
+lib: [
+  "_build/install/default/lib/forcamla/META"
+  "_build/install/default/lib/forcamla/dune-package"
+  "_build/install/default/lib/forcamla/forcamla.a"
+  "_build/install/default/lib/forcamla/forcamla.cma"
+  "_build/install/default/lib/forcamla/forcamla.cmxa"
+  "_build/install/default/lib/forcamla/formula.cmi"
+  "_build/install/default/lib/forcamla/formula.cmt"
+  "_build/install/default/lib/forcamla/formula.cmti"
+  "_build/install/default/lib/forcamla/formula.cmx"
+  "_build/install/default/lib/forcamla/formula.ml"
+  "_build/install/default/lib/forcamla/formula.mli"
+  "_build/install/default/lib/forcamla/opam"
+]
+libexec: [
+  "_build/install/default/lib/forcamla/forcamla.cmxs"
+]
