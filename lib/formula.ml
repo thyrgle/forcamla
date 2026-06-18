@@ -16,6 +16,7 @@ type expr =
 and term =
 {
   mutable parents: formula list;
+  mutable on_change: (unit -> unit) list;
   mutable value: data;
 }
 and compound =
@@ -23,6 +24,7 @@ and compound =
   mutable parents: formula list;
   mutable value: data;
   expression: expr;
+  mutable on_change: (unit -> unit) list;
   mutable needs_update: bool;
 }
 and formula = Compound of compound | Term of term
@@ -105,9 +107,9 @@ and update_formula (f: formula) =
     else ())
   | Term t -> () (* Update formula on a term should do nothing because only update_term changes it. *)
 
-let ft (value: float): formula = Term { parents = []; value = Float value }
-let it (value: int): formula = Term { parents = []; value = Int value }
-let bt (value: bool): formula = Term { parents = []; value = Bool value }
+let ft (value: float): formula = Term { parents = []; on_change = []; value = Float value }
+let it (value: int): formula = Term { parents = []; on_change = []; value = Int value }
+let bt (value: bool): formula = Term { parents = []; on_change = []; value = Bool value }
 
 let (=:) (f: formula) (value: int) = match f with
   | Compound c -> raise (AssignmentError "Cannot assign compound formula.")
@@ -134,6 +136,7 @@ let add_form (f1: formula) (f2: formula): formula =
       parents = [];
       value = add_datum c1.value c2.value;
       expression = Add (c1.expression, c2.expression);
+      on_change = [];
       needs_update = false;
     } in
     c1.parents <- Compound f :: c1.parents;
@@ -144,6 +147,7 @@ let add_form (f1: formula) (f2: formula): formula =
       parents = [];
       value = add_datum c1.value t2.value;
       expression = Add (c1.expression, Num t2);
+      on_change = [];
       needs_update = false;
     } in
     c1.parents <- Compound f :: c1.parents;
@@ -156,6 +160,7 @@ let add_form (f1: formula) (f2: formula): formula =
       parents = [];
       value = add_datum t1.value c2.value;
       expression = Add (Num t1, c2.expression);
+      on_change = [];
       needs_update = false;
     } in
     t1.parents <- Compound f :: t1.parents;
@@ -166,6 +171,7 @@ let add_form (f1: formula) (f2: formula): formula =
       parents = [];
       value = add_datum t1.value t2.value;
       expression = Add (Num t1, Num t2);
+      on_change = [];
       needs_update = false;
     } in
     t1.parents <- Compound f :: t1.parents;
@@ -185,6 +191,7 @@ let sub_form (f1: formula) (f2: formula): formula =
       parents = [];
       value = sub_datum c1.value c2.value;
       expression = Sub (c1.expression, c2.expression);
+      on_change = [];
       needs_update = false;
     } in
     c1.parents <- Compound f :: c1.parents;
@@ -195,6 +202,7 @@ let sub_form (f1: formula) (f2: formula): formula =
       parents = [];
       value = sub_datum c1.value t2.value;
       expression = Sub (c1.expression, Num t2);
+      on_change = [];
       needs_update = false;
     } in
     c1.parents <- Compound f :: c1.parents;
@@ -207,6 +215,7 @@ let sub_form (f1: formula) (f2: formula): formula =
       parents = [];
       value = sub_datum t1.value c2.value;
       expression = Sub (Num t1, c2.expression);
+      on_change = [];
       needs_update = false;
     } in
     t1.parents <- Compound f :: t1.parents;
@@ -217,6 +226,7 @@ let sub_form (f1: formula) (f2: formula): formula =
       parents = [];
       value = sub_datum t1.value t2.value;
       expression = Sub (Num t1, Num t2);
+      on_change = [];
       needs_update = false;
     } in
     t1.parents <- Compound f :: t1.parents;
@@ -236,6 +246,7 @@ let mul_form (f1: formula) (f2: formula): formula =
       parents = [];
       value = mul_datum c1.value c2.value;
       expression = Mul (c1.expression, c2.expression);
+      on_change = [];
       needs_update = false;
     } in
     c1.parents <- Compound f :: c1.parents;
@@ -246,6 +257,7 @@ let mul_form (f1: formula) (f2: formula): formula =
       parents = [];
       value = mul_datum c1.value t2.value;
       expression = Mul (c1.expression, Num t2);
+      on_change = [];
       needs_update = false;
     } in
     c1.parents <- Compound f :: c1.parents;
@@ -258,6 +270,7 @@ let mul_form (f1: formula) (f2: formula): formula =
       parents = [];
       value = mul_datum t1.value c2.value;
       expression = Mul (Num t1, c2.expression);
+      on_change = [];
       needs_update = false;
     } in
     t1.parents <- Compound f :: t1.parents;
@@ -268,6 +281,7 @@ let mul_form (f1: formula) (f2: formula): formula =
       parents = [];
       value = mul_datum t1.value t2.value;
       expression = Mul (Num t1, Num t2);
+      on_change = [];
       needs_update = false;
     } in
     t1.parents <- Compound f :: t1.parents;
@@ -286,6 +300,7 @@ let div_form (f1: formula) (f2: formula): formula =
       parents = [];
       value = div_datum c1.value c2.value;
       expression = Div (c1.expression, c2.expression);
+      on_change = [];
       needs_update = false;
     } in
     c1.parents <- Compound f :: c1.parents;
@@ -296,6 +311,7 @@ let div_form (f1: formula) (f2: formula): formula =
       parents = [];
       value = div_datum c1.value t2.value;
       expression = Div (c1.expression, Num t2);
+      on_change = [];
       needs_update = false;
     } in
     c1.parents <- Compound f :: c1.parents;
@@ -308,6 +324,7 @@ let div_form (f1: formula) (f2: formula): formula =
       parents = [];
       value = div_datum t1.value c2.value;
       expression = Div (Num t1, c2.expression);
+      on_change = [];
       needs_update = false;
     } in
     t1.parents <- Compound f :: t1.parents;
@@ -318,6 +335,7 @@ let div_form (f1: formula) (f2: formula): formula =
       parents = [];
       value = div_datum t1.value t2.value;
       expression = Div (Num t1, Num t2);
+      on_change = [];
       needs_update = false;
     } in
     t1.parents <- Compound f :: t1.parents;
@@ -364,3 +382,9 @@ let bool_of_formula (f: formula): bool =
     (match t.value with
      | Bool v -> v
      | _    -> raise (ExtractionError "Term does not evaluate to int."))
+
+
+(* Listeners *)
+let on_change (f: formula) (g: unit -> unit) = match f with
+  | Compound c -> c.on_change <- g :: c.on_change
+  | Term t -> t.on_change <- g :: t.on_change

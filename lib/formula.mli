@@ -58,3 +58,5 @@ val int_of_formula : formula -> int
 val float_of_formula : formula -> float
 val bool_of_formula : formula -> bool
 
+(** Event listener constructors *)
+val on_change : formula -> (unit -> unit) -> unit
