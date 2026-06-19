@@ -114,440 +114,215 @@ let (!) (f: 'a formula) = match f with
 
 (* Arithmetic functions. *)
 
-(* Addition of int typed formula. *)
-let add_form_int (f1: int formula) (f2: int formula): int formula = 
-  match f1 with
-  | Compound c1 ->
-   (match f2 with
-    | Compound c2 -> let f =
-    {
-      parents = [];
-      value = c1.value + c2.value;
-      expression = Add (c1.expression, c2.expression);
-      on_change = [];
-      needs_update = false;
-    } in
-    c1.parents <- Compound f :: c1.parents;
-    c2.parents <- Compound f :: c2.parents;
-    Compound f
-    | Term t2 -> let f =
-    {
-      parents = [];
-      value = c1.value + t2.value;
-      expression = Add (c1.expression, Num t2);
-      on_change = [];
-      needs_update = false;
-    } in
-    c1.parents <- Compound f :: c1.parents;
-    t2.parents <- Compound f :: t2.parents;
-    Compound f)
-  | Term t1 ->
-   (match f2 with
-    | Compound c2 -> let f =
-    {
-      parents = [];
-      value = t1.value + c2.value;
-      expression = Add (Num t1, c2.expression);
-      on_change = [];
-      needs_update = false;
-    } in
-    t1.parents <- Compound f :: t1.parents;
-    c2.parents <- Compound f :: c2.parents;
-    Compound f
-    | Term t2 -> let f =
-    {
-      parents = [];
-      value = t1.value + t2.value;
-      expression = Add (Num t1, Num t2);
-      on_change = [];
-      needs_update = false;
-    } in
-    t1.parents <- Compound f :: t1.parents;
-    t2.parents <- Compound f :: t2.parents;
-    Compound f)
+let formula_create (e: 'a expr) (value: 'a) =
+  { parents = []; value = value; on_change = []; needs_update = false; expression = e }
 
+(* Addition of int typed formula. *)
+let add_form_int (f1: int formula) (f2: int formula): int formula =
+  match (f1, f2) with
+  | (Compound c1, Compound c2) -> 
+      let f = formula_create (Add (c1.expression, c2.expression)) (c1.value + c2.value) in
+      c1.parents <- Compound f :: c1.parents;
+      c2.parents <- Compound f :: c2.parents;
+      Compound f
+  | (Compound c1, Term t2) ->
+      let f = formula_create (Add (c1.expression, Num t2)) (c1.value + t2.value) in
+      c1.parents <- Compound f :: c1.parents;
+      t2.parents <- Compound f :: t2.parents;
+      Compound f
+  | (Term t1, Compound c2) ->
+      let f = formula_create (Add (Num t1, c2.expression)) (t1.value + c2.value) in
+      t1.parents <- Compound f :: t1.parents;
+      c2.parents <- Compound f :: c2.parents;
+      Compound f
+    | (Term t1, Term t2) ->
+       let f = formula_create (Add (Num t1, Num t2)) (t1.value + t2.value) in
+       t1.parents <- Compound f :: t1.parents;
+       t2.parents <- Compound f :: t2.parents;
+       Compound f
 
 let (+) = add_form_int
 
 (* Subtraction of new types. *)
-let sub_form_int (f1: int formula) (f2: int formula): int formula = 
-  match f1 with
-  | Compound c1 ->
-   (match f2 with
-    | Compound c2 -> let f =
-    {
-      parents = [];
-      value = c1.value - c2.value;
-      expression = Sub (c1.expression, c2.expression);
-      on_change = [];
-      needs_update = false;
-    } in
-    c1.parents <- Compound f :: c1.parents;
-    c2.parents <- Compound f :: c2.parents;
-    Compound f
-    | Term t2 -> let f =
-    {
-      parents = [];
-      value = c1.value - t2.value;
-      expression = Sub (c1.expression, Num t2);
-      on_change = [];
-      needs_update = false;
-    } in
-    c1.parents <- Compound f :: c1.parents;
-    t2.parents <- Compound f :: t2.parents;
-    Compound f)
-  | Term t1 ->
-   (match f2 with
-    | Compound c2 -> let f =
-    {
-      parents = [];
-      value = t1.value - c2.value;
-      expression = Sub (Num t1, c2.expression);
-      on_change = [];
-      needs_update = false;
-    } in
-    t1.parents <- Compound f :: t1.parents;
-    c2.parents <- Compound f :: c2.parents;
-    Compound f
-    | Term t2 -> let f =
-    {
-      parents = [];
-      value = t1.value - t2.value;
-      expression = Sub (Num t1, Num t2);
-      on_change = [];
-      needs_update = false;
-    } in
-    t1.parents <- Compound f :: t1.parents;
-    t2.parents <- Compound f :: t2.parents;
-    Compound f)
-
+let sub_form_int (f1: int formula) (f2: int formula): int formula =
+  match (f1, f2) with
+  | (Compound c1, Compound c2) -> 
+      let f = formula_create (Sub (c1.expression, c2.expression)) (c1.value - c2.value) in
+      c1.parents <- Compound f :: c1.parents;
+      c2.parents <- Compound f :: c2.parents;
+      Compound f
+  | (Compound c1, Term t2) ->
+      let f = formula_create (Sub (c1.expression, Num t2)) (c1.value - t2.value) in
+      c1.parents <- Compound f :: c1.parents;
+      t2.parents <- Compound f :: t2.parents;
+      Compound f
+  | (Term t1, Compound c2) ->
+      let f = formula_create (Sub (Num t1, c2.expression)) (t1.value - c2.value) in
+      t1.parents <- Compound f :: t1.parents;
+      c2.parents <- Compound f :: c2.parents;
+      Compound f
+    | (Term t1, Term t2) ->
+       let f = formula_create (Sub (Num t1, Num t2)) (t1.value - t2.value) in
+       t1.parents <- Compound f :: t1.parents;
+       t2.parents <- Compound f :: t2.parents;
+       Compound f
 
 let (-) = sub_form_int
 
 (* Multiplication of new types. *)
-let mul_form_int (f1: int formula) (f2: int formula): int formula = 
-  match f1 with
-  | Compound c1 ->
-   (match f2 with
-    | Compound c2 -> let f =
-    {
-      parents = [];
-      value = c1.value * c2.value;
-      expression = Mul (c1.expression, c2.expression);
-      on_change = [];
-      needs_update = false;
-    } in
-    c1.parents <- Compound f :: c1.parents;
-    c2.parents <- Compound f :: c2.parents;
-    Compound f
-    | Term t2 -> let f =
-    {
-      parents = [];
-      value = c1.value * t2.value;
-      expression = Mul (c1.expression, Num t2);
-      on_change = [];
-      needs_update = false;
-    } in
-    c1.parents <- Compound f :: c1.parents;
-    t2.parents <- Compound f :: t2.parents;
-    Compound f)
-  | Term t1 ->
-   (match f2 with
-    | Compound c2 -> let f =
-    {
-      parents = [];
-      value = t1.value * c2.value;
-      expression = Mul (Num t1, c2.expression);
-      on_change = [];
-      needs_update = false;
-    } in
-    t1.parents <- Compound f :: t1.parents;
-    c2.parents <- Compound f :: c2.parents;
-    Compound f
-    | Term t2 -> let f =
-    {
-      parents = [];
-      value = t1.value * t2.value;
-      expression = Mul (Num t1, Num t2);
-      on_change = [];
-      needs_update = false;
-    } in
-    t1.parents <- Compound f :: t1.parents;
-    t2.parents <- Compound f :: t2.parents;
-    Compound f)
+let mul_form_int (f1: int formula) (f2: int formula): int formula =
+  match (f1, f2) with
+  | (Compound c1, Compound c2) -> 
+      let f = formula_create (Mul (c1.expression, c2.expression)) (c1.value * c2.value) in
+      c1.parents <- Compound f :: c1.parents;
+      c2.parents <- Compound f :: c2.parents;
+      Compound f
+  | (Compound c1, Term t2) ->
+      let f = formula_create (Mul (c1.expression, Num t2)) (c1.value * t2.value) in
+      c1.parents <- Compound f :: c1.parents;
+      t2.parents <- Compound f :: t2.parents;
+      Compound f
+  | (Term t1, Compound c2) ->
+      let f = formula_create (Mul (Num t1, c2.expression)) (t1.value * c2.value) in
+      t1.parents <- Compound f :: t1.parents;
+      c2.parents <- Compound f :: c2.parents;
+      Compound f
+    | (Term t1, Term t2) ->
+       let f = formula_create (Mul (Num t1, Num t2)) (t1.value * t2.value) in
+       t1.parents <- Compound f :: t1.parents;
+       t2.parents <- Compound f :: t2.parents;
+       Compound f
 
 let ( * ) = mul_form_int
 
 (* Division of new types. *)
-let div_form_int (f1: int formula) (f2: int formula): int formula = 
-  match f1 with
-  | Compound c1 ->
-   (match f2 with
-    | Compound c2 -> let f =
-    {
-      parents = [];
-      value = c1.value / c2.value;
-      expression = Div (c1.expression, c2.expression);
-      on_change = [];
-      needs_update = false;
-    } in
-    c1.parents <- Compound f :: c1.parents;
-    c2.parents <- Compound f :: c2.parents;
-    Compound f
-    | Term t2 -> let f =
-    {
-      parents = [];
-      value = c1.value / t2.value;
-      expression = Div (c1.expression, Num t2);
-      on_change = [];
-      needs_update = false;
-    } in
-    c1.parents <- Compound f :: c1.parents;
-    t2.parents <- Compound f :: t2.parents;
-    Compound f)
-  | Term t1 ->
-   (match f2 with
-    | Compound c2 -> let f =
-    {
-      parents = [];
-      value = t1.value / c2.value;
-      expression = Div (Num t1, c2.expression);
-      on_change = [];
-      needs_update = false;
-    } in
-    t1.parents <- Compound f :: t1.parents;
-    c2.parents <- Compound f :: c2.parents;
-    Compound f
-    | Term t2 -> let f =
-    {
-      parents = [];
-      value = t1.value / t2.value;
-      expression = Div (Num t1, Num t2);
-      on_change = [];
-      needs_update = false;
-    } in
-    t1.parents <- Compound f :: t1.parents;
-    t2.parents <- Compound f :: t2.parents;
-    Compound f)
+let div_form_int (f1: int formula) (f2: int formula): int formula =
+  match (f1, f2) with
+  | (Compound c1, Compound c2) -> 
+      let f = formula_create (Div (c1.expression, c2.expression)) (c1.value / c2.value) in
+      c1.parents <- Compound f :: c1.parents;
+      c2.parents <- Compound f :: c2.parents;
+      Compound f
+  | (Compound c1, Term t2) ->
+      let f = formula_create (Div (c1.expression, Num t2)) (c1.value / t2.value) in
+      c1.parents <- Compound f :: c1.parents;
+      t2.parents <- Compound f :: t2.parents;
+      Compound f
+  | (Term t1, Compound c2) ->
+      let f = formula_create (Div (Num t1, c2.expression)) (t1.value / c2.value) in
+      t1.parents <- Compound f :: t1.parents;
+      c2.parents <- Compound f :: c2.parents;
+      Compound f
+    | (Term t1, Term t2) ->
+       let f = formula_create (Div (Num t1, Num t2)) (t1.value / t2.value) in
+       t1.parents <- Compound f :: t1.parents;
+       t2.parents <- Compound f :: t2.parents;
+       Compound f
 
 let (/) = div_form_int
 
-
 (* Addition of float typed formula. *)
 let add_form_float (f1: float formula) (f2: float formula): float formula = 
-  match f1 with
-  | Compound c1 ->
-   (match f2 with
-    | Compound c2 -> let f =
-    {
-      parents = [];
-      value = c1.value +. c2.value;
-      expression = Add (c1.expression, c2.expression);
-      on_change = [];
-      needs_update = false;
-    } in
-    c1.parents <- Compound f :: c1.parents;
-    c2.parents <- Compound f :: c2.parents;
-    Compound f
-    | Term t2 -> let f =
-    {
-      parents = [];
-      value = c1.value +. t2.value;
-      expression = Add (c1.expression, Num t2);
-      on_change = [];
-      needs_update = false;
-    } in
-    c1.parents <- Compound f :: c1.parents;
-    t2.parents <- Compound f :: t2.parents;
-    Compound f)
-  | Term t1 ->
-   (match f2 with
-    | Compound c2 -> let f =
-    {
-      parents = [];
-      value = t1.value +. c2.value;
-      expression = Add (Num t1, c2.expression);
-      on_change = [];
-      needs_update = false;
-    } in
-    t1.parents <- Compound f :: t1.parents;
-    c2.parents <- Compound f :: c2.parents;
-    Compound f
-    | Term t2 -> let f =
-    {
-      parents = [];
-      value = t1.value +. t2.value;
-      expression = Add (Num t1, Num t2);
-      on_change = [];
-      needs_update = false;
-    } in
-    t1.parents <- Compound f :: t1.parents;
-    t2.parents <- Compound f :: t2.parents;
-    Compound f)
+  match (f1, f2) with
+  | (Compound c1, Compound c2) -> 
+      let f = formula_create (Add (c1.expression, c2.expression)) (c1.value +. c2.value) in
+      c1.parents <- Compound f :: c1.parents;
+      c2.parents <- Compound f :: c2.parents;
+      Compound f
+  | (Compound c1, Term t2) ->
+      let f = formula_create (Add (c1.expression, Num t2)) (c1.value +. t2.value) in
+      c1.parents <- Compound f :: c1.parents;
+      t2.parents <- Compound f :: t2.parents;
+      Compound f
+  | (Term t1, Compound c2) ->
+      let f = formula_create (Add (Num t1, c2.expression)) (t1.value +. c2.value) in
+      t1.parents <- Compound f :: t1.parents;
+      c2.parents <- Compound f :: c2.parents;
+      Compound f
+    | (Term t1, Term t2) ->
+       let f = formula_create (Add (Num t1, Num t2)) (t1.value +. t2.value) in
+       t1.parents <- Compound f :: t1.parents;
+       t2.parents <- Compound f :: t2.parents;
+       Compound f
 
 
 let (+.) = add_form_float
 
 (* Subtraction of new types. *)
 let sub_form_float (f1: float formula) (f2: float formula): float formula = 
-  match f1 with
-  | Compound c1 ->
-   (match f2 with
-    | Compound c2 -> let f =
-    {
-      parents = [];
-      value = c1.value -. c2.value;
-      expression = Sub (c1.expression, c2.expression);
-      on_change = [];
-      needs_update = false;
-    } in
-    c1.parents <- Compound f :: c1.parents;
-    c2.parents <- Compound f :: c2.parents;
-    Compound f
-    | Term t2 -> let f =
-    {
-      parents = [];
-      value = c1.value -. t2.value;
-      expression = Sub (c1.expression, Num t2);
-      on_change = [];
-      needs_update = false;
-    } in
-    c1.parents <- Compound f :: c1.parents;
-    t2.parents <- Compound f :: t2.parents;
-    Compound f)
-  | Term t1 ->
-   (match f2 with
-    | Compound c2 -> let f =
-    {
-      parents = [];
-      value = t1.value -. c2.value;
-      expression = Sub (Num t1, c2.expression);
-      on_change = [];
-      needs_update = false;
-    } in
-    t1.parents <- Compound f :: t1.parents;
-    c2.parents <- Compound f :: c2.parents;
-    Compound f
-    | Term t2 -> let f =
-    {
-      parents = [];
-      value = t1.value -. t2.value;
-      expression = Sub (Num t1, Num t2);
-      on_change = [];
-      needs_update = false;
-    } in
-    t1.parents <- Compound f :: t1.parents;
-    t2.parents <- Compound f :: t2.parents;
-    Compound f)
-
+  match (f1, f2) with
+  | (Compound c1, Compound c2) -> 
+      let f = formula_create (Sub (c1.expression, c2.expression)) (c1.value -. c2.value) in
+      c1.parents <- Compound f :: c1.parents;
+      c2.parents <- Compound f :: c2.parents;
+      Compound f
+  | (Compound c1, Term t2) ->
+      let f = formula_create (Sub (c1.expression, Num t2)) (c1.value -. t2.value) in
+      c1.parents <- Compound f :: c1.parents;
+      t2.parents <- Compound f :: t2.parents;
+      Compound f
+  | (Term t1, Compound c2) ->
+      let f = formula_create (Sub (Num t1, c2.expression)) (t1.value -. c2.value) in
+      t1.parents <- Compound f :: t1.parents;
+      c2.parents <- Compound f :: c2.parents;
+      Compound f
+    | (Term t1, Term t2) ->
+       let f = formula_create (Sub (Num t1, Num t2)) (t1.value -. t2.value) in
+       t1.parents <- Compound f :: t1.parents;
+       t2.parents <- Compound f :: t2.parents;
+       Compound f
 
 let (-.) = sub_form_float
 
 (* Multiplication of new types. *)
 let mul_form_float (f1: float formula) (f2: float formula): float formula = 
-  match f1 with
-  | Compound c1 ->
-   (match f2 with
-    | Compound c2 -> let f =
-    {
-      parents = [];
-      value = c1.value *. c2.value;
-      expression = Mul (c1.expression, c2.expression);
-      on_change = [];
-      needs_update = false;
-    } in
-    c1.parents <- Compound f :: c1.parents;
-    c2.parents <- Compound f :: c2.parents;
-    Compound f
-    | Term t2 -> let f =
-    {
-      parents = [];
-      value = c1.value *. t2.value;
-      expression = Mul (c1.expression, Num t2);
-      on_change = [];
-      needs_update = false;
-    } in
-    c1.parents <- Compound f :: c1.parents;
-    t2.parents <- Compound f :: t2.parents;
-    Compound f)
-  | Term t1 ->
-   (match f2 with
-    | Compound c2 -> let f =
-    {
-      parents = [];
-      value = t1.value *. c2.value;
-      expression = Mul (Num t1, c2.expression);
-      on_change = [];
-      needs_update = false;
-    } in
-    t1.parents <- Compound f :: t1.parents;
-    c2.parents <- Compound f :: c2.parents;
-    Compound f
-    | Term t2 -> let f =
-    {
-      parents = [];
-      value = t1.value *. t2.value;
-      expression = Mul (Num t1, Num t2);
-      on_change = [];
-      needs_update = false;
-    } in
-    t1.parents <- Compound f :: t1.parents;
-    t2.parents <- Compound f :: t2.parents;
-    Compound f)
+  match (f1, f2) with
+  | (Compound c1, Compound c2) -> 
+      let f = formula_create (Mul (c1.expression, c2.expression)) (c1.value *. c2.value) in
+      c1.parents <- Compound f :: c1.parents;
+      c2.parents <- Compound f :: c2.parents;
+      Compound f
+  | (Compound c1, Term t2) ->
+      let f = formula_create (Mul (c1.expression, Num t2)) (c1.value *. t2.value) in
+      c1.parents <- Compound f :: c1.parents;
+      t2.parents <- Compound f :: t2.parents;
+      Compound f
+  | (Term t1, Compound c2) ->
+      let f = formula_create (Mul (Num t1, c2.expression)) (t1.value *. c2.value) in
+      t1.parents <- Compound f :: t1.parents;
+      c2.parents <- Compound f :: c2.parents;
+      Compound f
+    | (Term t1, Term t2) ->
+       let f = formula_create (Mul (Num t1, Num t2)) (t1.value *. t2.value) in
+       t1.parents <- Compound f :: t1.parents;
+       t2.parents <- Compound f :: t2.parents;
+       Compound f
 
 let ( *. ) = mul_form_float
 
 (* Division of new types. *)
-let div_form_float (f1: float formula) (f2: float formula): float formula = 
-  match f1 with
-  | Compound c1 ->
-   (match f2 with
-    | Compound c2 -> let f =
-    {
-      parents = [];
-      value = c1.value /. c2.value;
-      expression = Div (c1.expression, c2.expression);
-      on_change = [];
-      needs_update = false;
-    } in
-    c1.parents <- Compound f :: c1.parents;
-    c2.parents <- Compound f :: c2.parents;
-    Compound f
-    | Term t2 -> let f =
-    {
-      parents = [];
-      value = c1.value /. t2.value;
-      expression = Div (c1.expression, Num t2);
-      on_change = [];
-      needs_update = false;
-    } in
-    c1.parents <- Compound f :: c1.parents;
-    t2.parents <- Compound f :: t2.parents;
-    Compound f)
-  | Term t1 ->
-   (match f2 with
-    | Compound c2 -> let f =
-    {
-      parents = [];
-      value = t1.value /. c2.value;
-      expression = Div (Num t1, c2.expression);
-      on_change = [];
-      needs_update = false;
-    } in
-    t1.parents <- Compound f :: t1.parents;
-    c2.parents <- Compound f :: c2.parents;
-    Compound f
-    | Term t2 -> let f =
-    {
-      parents = [];
-      value = t1.value /. t2.value;
-      expression = Div (Num t1, Num t2);
-      on_change = [];
-      needs_update = false;
-    } in
-    t1.parents <- Compound f :: t1.parents;
-    t2.parents <- Compound f :: t2.parents;
-    Compound f)
+let div_form_float (f1: float formula) (f2: float formula): float formula =
+  match (f1, f2) with
+  | (Compound c1, Compound c2) -> 
+      let f = formula_create (Div (c1.expression, c2.expression)) (c1.value /. c2.value) in
+      c1.parents <- Compound f :: c1.parents;
+      c2.parents <- Compound f :: c2.parents;
+      Compound f
+  | (Compound c1, Term t2) ->
+      let f = formula_create (Div (c1.expression, Num t2)) (c1.value /. t2.value) in
+      c1.parents <- Compound f :: c1.parents;
+      t2.parents <- Compound f :: t2.parents;
+      Compound f
+  | (Term t1, Compound c2) ->
+      let f = formula_create (Div (Num t1, c2.expression)) (t1.value /. c2.value) in
+      t1.parents <- Compound f :: t1.parents;
+      c2.parents <- Compound f :: c2.parents;
+      Compound f
+    | (Term t1, Term t2) ->
+       let f = formula_create (Div (Num t1, Num t2)) (t1.value /. t2.value) in
+       t1.parents <- Compound f :: t1.parents;
+       t2.parents <- Compound f :: t2.parents;
+       Compound f
 
 let (/.) = div_form_float
 
