@@ -1,62 +1,41 @@
 (** The fundamental types: terms (ref with superpowers!) and formula (combined terms). **)
 
-(** A ref-like type with superpowers! *)
-type term
-
 (** A combination of terms that represent a mathematical formula *)
-type formula
+type 'a formula
 
 (** Lift basic types to term types. *)
 
 (** Create term from float. *)
-val ft : float -> formula
+val ft : float -> float formula
 
 (** Create term from int. *)
-val it : int -> formula
-(** Create term from bool. *)
-val bt : bool -> formula
+val it : int -> int formula
 
 (** Update term methods. *)
 
 (** Update an int term to a new value. *)
-val (=:) : formula -> int -> unit
-
+val (=:) : int formula -> int -> unit
 (** Update a float term to a new value. *)
-val (=:.) : formula -> float -> unit
-
-(** Update a bool term to a new value. *)
-val (=:|) : formula -> bool -> unit
-
+val (=:.) : float formula -> float -> unit
 (** Update a term by evaluating a formula *)
-val (=::) : formula -> formula -> unit
+val (=::) : int formula -> int formula -> unit
+
+(** Get current value of formula. Similar to (!) for ref types. *)
+val (!) : 'a formula -> 'a
 
 (** Formula creation methods. *)
 
-(** Arithmetic for terms. *)
-val add_form : formula -> formula -> formula
-val sub_form : formula -> formula -> formula
-val mul_form : formula -> formula -> formula
-val div_form : formula -> formula -> formula
+(** Arithmetic for integer terms. *)
+val add_form_int : int formula -> int formula -> int formula
+val sub_form_int : int formula -> int formula -> int formula
+val mul_form_int : int formula -> int formula -> int formula
+val div_form_int : int formula -> int formula -> int formula
 
 (** Shorthand arithmetic for terms. *)
-val (+) : formula -> formula -> formula
-val (-) : formula -> formula -> formula
-val ( * ) : formula -> formula -> formula
-val (/) : formula -> formula -> formula
-
-
-(** Shorthand arithmetic for terms. *)
-val (+) : formula -> formula -> formula
-val (-) : formula -> formula -> formula
-val ( * ) : formula -> formula -> formula
-val (/) : formula -> formula -> formula
-
-(** Extract raw values from either terms of formula. *)
-
-(** Extraction methods for formulas *)
-val int_of_formula : formula -> int
-val float_of_formula : formula -> float
-val bool_of_formula : formula -> bool
+val (+) : int formula -> int formula -> int formula
+val (-) : int formula -> int formula -> int formula
+val ( * ) : int formula -> int formula -> int formula
+val (/) : int formula -> int formula -> int formula
 
 (** Event listener constructors *)
-val on_change : formula -> (unit -> unit) -> unit
+val on_change : 'a formula -> (unit -> unit) -> unit

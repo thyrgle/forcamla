@@ -3,138 +3,125 @@ exception UnsupportedType of string
 exception ExtractionError of string
 exception AssignmentError of string
 
-type data =
-  Float of float
-| Int of int
-| Bool of bool
-type expr =
-  Num of term        
-| Add of expr * expr
-| Sub of expr * expr
-| Mul of expr * expr
-| Div of expr * expr
-and term =
+type 'a expr =
+  Num of 'a term        
+| Add of 'a expr * 'a expr
+| Sub of 'a expr * 'a expr
+| Mul of 'a expr * 'a expr
+| Div of 'a expr * 'a expr
+and 'a term =
 {
-  mutable parents: formula list;
+  mutable parents: 'a formula list;
   mutable on_change: (unit -> unit) list;
-  mutable value: data;
+  mutable value: 'a;
 }
-and compound =
+and 'a compound =
 {
-  mutable parents: formula list;
-  mutable value: data;
-  expression: expr;
+  mutable parents: 'a formula list;
+  mutable value: 'a;
+  expression: 'a expr;
   mutable on_change: (unit -> unit) list;
   mutable needs_update: bool;
 }
-and formula = Compound of compound | Term of term
+and 'a formula = Compound of 'a compound | Term of 'a term
 
-let add_datum (a: data) (b: data): data =
-  match a with
-  | Float x -> (match b with
-    | Float y -> Float (x +. y)
-    | _       -> raise (CastError "Terms cannot be added."))
-  | Int x   -> (match b with
-    | Int y   -> Int (x + y)
-    | _       -> raise (CastError "Terms cannot be added."))
-  | Bool _ -> raise (UnsupportedType "Cannot add booleans")
-
-
-let sub_datum (a: data) (b: data): data =
-  match a with
-  | Float x -> (match b with
-    | Float y -> Float (x -. y)
-    | _       -> raise (CastError "Terms cannot be subtracted."))
-  | Int x   -> (match b with
-    | Int y   -> Int (x - y)
-    | _       -> raise (CastError "Terms cannot be subtracted."))
-  | Bool _ -> raise (UnsupportedType "Cannot subtract booleans")
-
-let mul_datum (a: data) (b: data): data =
-  match a with
-  | Float x -> (match b with
-    | Float y -> Float (x *. y)
-    | _       -> raise (CastError "Terms cannot be multiplied."))
-  | Int x   -> (match b with
-    | Int y   -> Int (x * y)
-    | _       -> raise (CastError "Terms cannot be multiplied."))
-  | Bool _ -> raise (UnsupportedType "Cannot multiply booleans.")
-
-let div_datum (a: data) (b: data): data =
-  match a with
-  | Float x -> (match b with
-    | Float y -> Float (x -. y)
-    | _       -> raise (CastError "Terms cannot be multiplied."))
-  | Int x   -> (match b with
-    | Int y   -> Int (x - y)
-    | _       -> raise (CastError "Terms cannot be multiplied."))
-  | Bool _ -> raise (UnsupportedType "Cannot multiply booleans.")
-
-let rec eval_expr (e: expr): data =
+let rec eval_expr_int (e: int expr): int =
   match e with
-    | Add (a, b) -> add_datum (eval_expr a) (eval_expr b)
-    | Sub (a, b) -> sub_datum (eval_expr a) (eval_expr b)
-    | Mul (a, b) -> mul_datum (eval_expr a) (eval_expr b)
-    | Div (a, b) -> div_datum (eval_expr a) (eval_expr b)
+    | Add (a, b) -> (eval_expr_int a) + (eval_expr_int b)
+    | Sub (a, b) -> (eval_expr_int a) - (eval_expr_int b)
+    | Mul (a, b) -> (eval_expr_int a) * (eval_expr_int b)
+    | Div (a, b) -> (eval_expr_int a) / (eval_expr_int b)
     | Num x -> x.value
-  
 
-let eval (f: formula): data =
+let rec eval_expr_float (e: float expr): float =
+  match e with
+    | Add (a, b) -> (eval_expr_float a) +. (eval_expr_float b)
+    | Sub (a, b) -> (eval_expr_float a) -. (eval_expr_float b)
+    | Mul (a, b) -> (eval_expr_float a) *. (eval_expr_float b)
+    | Div (a, b) -> (eval_expr_float a) /. (eval_expr_float b)
+    | Num x -> x.value
+
+  
+let eval_int (f: int formula): int =
   match f with
   | Compound c ->
     (match c.needs_update with
-    | true -> eval_expr c.expression
+    | true -> eval_expr_int c.expression
     | false -> c.value)
   | Term t -> t.value
 
-let set_needs_update (f: formula) =
+let eval_float (f: float formula): float =
+  match f with
+  | Compound c ->
+    (match c.needs_update with
+    | true -> eval_expr_float c.expression
+    | false -> c.value)
+  | Term t -> t.value
+
+let set_needs_update (f: 'a formula) =
   match f with
   | Compound c -> c.needs_update <- true
   | Term t -> ()
 
-let rec update_term (t: term) (new_val: data): unit = 
+let rec update_int_term (t: int term) (new_val: 'a): unit = 
   (t.value <- new_val;
   List.iter set_needs_update t.parents;
   List.iter update_formula t.parents)
-and update_formula (f: formula) =
+and update_formula (f: int formula) =
   match f with
   | Compound c ->
     (let old_val = c.value in
-    let new_val = eval f in
+    let new_val = eval_int f in
     if old_val <> new_val then
       (c.value <- new_val;
       List.iter update_formula c.parents)
     else ())
   | Term t -> () (* Update formula on a term should do nothing because only update_term changes it. *)
 
-let ft (value: float): formula = Term { parents = []; on_change = []; value = Float value }
-let it (value: int): formula = Term { parents = []; on_change = []; value = Int value }
-let bt (value: bool): formula = Term { parents = []; on_change = []; value = Bool value }
+let rec update_float_term (t: float term) (new_val: 'a): unit = 
+  (t.value <- new_val;
+  List.iter set_needs_update t.parents;
+  List.iter update_formula t.parents)
+and update_formula (f: float formula) =
+  match f with
+  | Compound c ->
+    (let old_val = c.value in
+    let new_val = eval_float f in
+    if old_val <> new_val then
+      (c.value <- new_val;
+      List.iter update_formula c.parents)
+    else ())
+  | Term t -> () (* Update formula on a term should do nothing because only update_term changes it. *)
 
-let (=:) (f: formula) (value: int) = match f with
+let it (value: int): int formula = Term { parents = []; on_change = []; value = value }
+let ft (value: float): float formula = Term { parents = []; on_change = []; value = value }
+let bt (value: bool): bool formula = Term { parents = []; on_change = []; value = value }
+
+let (=:) (f: int formula) (value: int) = match f with
   | Compound c -> raise (AssignmentError "Cannot assign compound formula.")
-  | Term t -> update_term t (Int value)
-let (=:.) (f: formula) (value: float) = match f with
+  | Term t -> update_int_term t value
+let (=:.) (f: float formula) (value: float) = match f with
   | Compound c -> raise (AssignmentError "Cannot assign compound formula.")
-  | Term t -> update_term t (Float value)
-let (=:|) (f: formula) (value: bool) = match f with
+  | Term t -> update_float_term t value
+let (=::) (f: int formula) (value: int formula) = match f with
   | Compound c -> raise (AssignmentError "Cannot assign compound formula.")
-  | Term t -> update_term t (Bool value)
-let (=::) (f: formula) (value: formula) = match f with
+  | Term t -> update_int_term t (eval_int value)
+let (=::.) (f: float formula) (value: float formula) = match f with
   | Compound c -> raise (AssignmentError "Cannot assign compound formula.")
-  | Term t -> update_term t (eval value)
+  | Term t -> update_float_term t (eval_float value)
+
 
 (* Arithmetic functions. *)
 
 (* Addition of new types. *)
-let add_form (f1: formula) (f2: formula): formula = 
+let add_form_int (f1: int formula) (f2: int formula): int formula = 
   match f1 with
   | Compound c1 ->
    (match f2 with
     | Compound c2 -> let f =
     {
       parents = [];
-      value = add_datum c1.value c2.value;
+      value = c1.value + c2.value;
       expression = Add (c1.expression, c2.expression);
       on_change = [];
       needs_update = false;
@@ -145,7 +132,7 @@ let add_form (f1: formula) (f2: formula): formula =
     | Term t2 -> let f =
     {
       parents = [];
-      value = add_datum c1.value t2.value;
+      value = c1.value + t2.value;
       expression = Add (c1.expression, Num t2);
       on_change = [];
       needs_update = false;
@@ -158,7 +145,7 @@ let add_form (f1: formula) (f2: formula): formula =
     | Compound c2 -> let f =
     {
       parents = [];
-      value = add_datum t1.value c2.value;
+      value = t1.value + c2.value;
       expression = Add (Num t1, c2.expression);
       on_change = [];
       needs_update = false;
@@ -169,7 +156,7 @@ let add_form (f1: formula) (f2: formula): formula =
     | Term t2 -> let f =
     {
       parents = [];
-      value = add_datum t1.value t2.value;
+      value = t1.value + t2.value;
       expression = Add (Num t1, Num t2);
       on_change = [];
       needs_update = false;
@@ -179,17 +166,17 @@ let add_form (f1: formula) (f2: formula): formula =
     Compound f)
 
 
-let (+) = add_form
+let (+) = add_form_int
 
 (* Subtraction of new types. *)
-let sub_form (f1: formula) (f2: formula): formula = 
+let sub_form_int (f1: int formula) (f2: int formula): int formula = 
   match f1 with
   | Compound c1 ->
    (match f2 with
     | Compound c2 -> let f =
     {
       parents = [];
-      value = sub_datum c1.value c2.value;
+      value = c1.value - c2.value;
       expression = Sub (c1.expression, c2.expression);
       on_change = [];
       needs_update = false;
@@ -200,7 +187,7 @@ let sub_form (f1: formula) (f2: formula): formula =
     | Term t2 -> let f =
     {
       parents = [];
-      value = sub_datum c1.value t2.value;
+      value = c1.value - t2.value;
       expression = Sub (c1.expression, Num t2);
       on_change = [];
       needs_update = false;
@@ -213,7 +200,7 @@ let sub_form (f1: formula) (f2: formula): formula =
     | Compound c2 -> let f =
     {
       parents = [];
-      value = sub_datum t1.value c2.value;
+      value = t1.value - c2.value;
       expression = Sub (Num t1, c2.expression);
       on_change = [];
       needs_update = false;
@@ -224,7 +211,7 @@ let sub_form (f1: formula) (f2: formula): formula =
     | Term t2 -> let f =
     {
       parents = [];
-      value = sub_datum t1.value t2.value;
+      value = t1.value - t2.value;
       expression = Sub (Num t1, Num t2);
       on_change = [];
       needs_update = false;
@@ -234,17 +221,17 @@ let sub_form (f1: formula) (f2: formula): formula =
     Compound f)
 
 
-let (-) = sub_form
+let (-) = sub_form_int
 
 (* Multiplication of new types. *)
-let mul_form (f1: formula) (f2: formula): formula = 
+let mul_form_int (f1: int formula) (f2: int formula): int formula = 
   match f1 with
   | Compound c1 ->
    (match f2 with
     | Compound c2 -> let f =
     {
       parents = [];
-      value = mul_datum c1.value c2.value;
+      value = c1.value * c2.value;
       expression = Mul (c1.expression, c2.expression);
       on_change = [];
       needs_update = false;
@@ -255,7 +242,7 @@ let mul_form (f1: formula) (f2: formula): formula =
     | Term t2 -> let f =
     {
       parents = [];
-      value = mul_datum c1.value t2.value;
+      value = c1.value * t2.value;
       expression = Mul (c1.expression, Num t2);
       on_change = [];
       needs_update = false;
@@ -268,7 +255,7 @@ let mul_form (f1: formula) (f2: formula): formula =
     | Compound c2 -> let f =
     {
       parents = [];
-      value = mul_datum t1.value c2.value;
+      value = t1.value * c2.value;
       expression = Mul (Num t1, c2.expression);
       on_change = [];
       needs_update = false;
@@ -279,7 +266,7 @@ let mul_form (f1: formula) (f2: formula): formula =
     | Term t2 -> let f =
     {
       parents = [];
-      value = mul_datum t1.value t2.value;
+      value = t1.value * t2.value;
       expression = Mul (Num t1, Num t2);
       on_change = [];
       needs_update = false;
@@ -288,17 +275,17 @@ let mul_form (f1: formula) (f2: formula): formula =
     t2.parents <- Compound f :: t2.parents;
     Compound f)
 
-let ( * ) = mul_form
+let ( * ) = mul_form_int
 
 (* Division of new types. *)
-let div_form (f1: formula) (f2: formula): formula = 
+let div_form_int (f1: int formula) (f2: int formula): int formula = 
   match f1 with
   | Compound c1 ->
    (match f2 with
     | Compound c2 -> let f =
     {
       parents = [];
-      value = div_datum c1.value c2.value;
+      value = c1.value / c2.value;
       expression = Div (c1.expression, c2.expression);
       on_change = [];
       needs_update = false;
@@ -309,7 +296,7 @@ let div_form (f1: formula) (f2: formula): formula =
     | Term t2 -> let f =
     {
       parents = [];
-      value = div_datum c1.value t2.value;
+      value = c1.value / t2.value;
       expression = Div (c1.expression, Num t2);
       on_change = [];
       needs_update = false;
@@ -322,7 +309,7 @@ let div_form (f1: formula) (f2: formula): formula =
     | Compound c2 -> let f =
     {
       parents = [];
-      value = div_datum t1.value c2.value;
+      value = t1.value / c2.value;
       expression = Div (Num t1, c2.expression);
       on_change = [];
       needs_update = false;
@@ -333,7 +320,7 @@ let div_form (f1: formula) (f2: formula): formula =
     | Term t2 -> let f =
     {
       parents = [];
-      value = div_datum t1.value t2.value;
+      value = t1.value / t2.value;
       expression = Div (Num t1, Num t2);
       on_change = [];
       needs_update = false;
@@ -342,49 +329,15 @@ let div_form (f1: formula) (f2: formula): formula =
     t2.parents <- Compound f :: t2.parents;
     Compound f)
 
-let (/) = div_form
+let (/) = div_form_int
 
 (* Extraction methods. *)
 
-(* Integer extraction method. *)
-let int_of_formula (f: formula): int =
-  match f with
-  | Compound c -> 
-    (match c.value with
-     | Int v -> v
-     | _     -> raise (ExtractionError "Formula does not evaluate to int."))
-  | Term t ->
-    (match t.value with
-     | Int v -> v
-     | _    -> raise (ExtractionError "Term does not evaluate to int."))
-
-(* Float extraction method. *)
-let float_of_formula (f: formula): float =
-  match f with
-  | Compound c -> 
-    (match c.value with
-     | Float v -> v
-     | _     -> raise (ExtractionError "Formula does not evaluate to int."))
-  | Term t ->
-    (match t.value with
-     | Float v -> v
-     | _    -> raise (ExtractionError "Term does not evaluate to int."))
-
-
-(* Boolean extraction method. *)
-let bool_of_formula (f: formula): bool =
-  match f with
-  | Compound c -> 
-    (match c.value with
-     | Bool v -> v
-     | _     -> raise (ExtractionError "Formula does not evaluate to int."))
-  | Term t ->
-    (match t.value with
-     | Bool v -> v
-     | _    -> raise (ExtractionError "Term does not evaluate to int."))
-
-
 (* Listeners *)
-let on_change (f: formula) (g: unit -> unit) = match f with
+let on_change (f: 'a formula) (g: unit -> unit) = match f with
   | Compound c -> c.on_change <- g :: c.on_change
   | Term t -> t.on_change <- g :: t.on_change
+
+let (!) (f: 'a formula) = match f with
+  | Compound c -> c.value
+  | Term t -> t.value
