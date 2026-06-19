@@ -37,7 +37,6 @@ let rec eval_expr_float (e: float expr): float =
     | Mul (a, b) -> (eval_expr_float a) *. (eval_expr_float b)
     | Div (a, b) -> (eval_expr_float a) /. (eval_expr_float b)
     | Num x -> x.value
-
   
 let eval_int (f: int formula): int =
   match f with
