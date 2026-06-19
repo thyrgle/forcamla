@@ -1,7 +1,7 @@
 exception AssignmentError of string
 
 type 'a expr =
-  Num of 'a term        
+  Num of 'a term
 | Add of 'a expr * 'a expr
 | Sub of 'a expr * 'a expr
 | Mul of 'a expr * 'a expr
