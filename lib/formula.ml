@@ -113,7 +113,7 @@ let (=::.) (f: float formula) (value: float formula) = match f with
 
 (* Arithmetic functions. *)
 
-(* Addition of new types. *)
+(* Addition of int typed formula. *)
 let add_form_int (f1: int formula) (f2: int formula): int formula = 
   match f1 with
   | Compound c1 ->
@@ -330,6 +330,226 @@ let div_form_int (f1: int formula) (f2: int formula): int formula =
     Compound f)
 
 let (/) = div_form_int
+
+
+(* Addition of float typed formula. *)
+let add_form_float (f1: float formula) (f2: float formula): float formula = 
+  match f1 with
+  | Compound c1 ->
+   (match f2 with
+    | Compound c2 -> let f =
+    {
+      parents = [];
+      value = c1.value +. c2.value;
+      expression = Add (c1.expression, c2.expression);
+      on_change = [];
+      needs_update = false;
+    } in
+    c1.parents <- Compound f :: c1.parents;
+    c2.parents <- Compound f :: c2.parents;
+    Compound f
+    | Term t2 -> let f =
+    {
+      parents = [];
+      value = c1.value +. t2.value;
+      expression = Add (c1.expression, Num t2);
+      on_change = [];
+      needs_update = false;
+    } in
+    c1.parents <- Compound f :: c1.parents;
+    t2.parents <- Compound f :: t2.parents;
+    Compound f)
+  | Term t1 ->
+   (match f2 with
+    | Compound c2 -> let f =
+    {
+      parents = [];
+      value = t1.value +. c2.value;
+      expression = Add (Num t1, c2.expression);
+      on_change = [];
+      needs_update = false;
+    } in
+    t1.parents <- Compound f :: t1.parents;
+    c2.parents <- Compound f :: c2.parents;
+    Compound f
+    | Term t2 -> let f =
+    {
+      parents = [];
+      value = t1.value +. t2.value;
+      expression = Add (Num t1, Num t2);
+      on_change = [];
+      needs_update = false;
+    } in
+    t1.parents <- Compound f :: t1.parents;
+    t2.parents <- Compound f :: t2.parents;
+    Compound f)
+
+
+let (+.) = add_form_float
+
+(* Subtraction of new types. *)
+let sub_form_float (f1: float formula) (f2: float formula): float formula = 
+  match f1 with
+  | Compound c1 ->
+   (match f2 with
+    | Compound c2 -> let f =
+    {
+      parents = [];
+      value = c1.value -. c2.value;
+      expression = Sub (c1.expression, c2.expression);
+      on_change = [];
+      needs_update = false;
+    } in
+    c1.parents <- Compound f :: c1.parents;
+    c2.parents <- Compound f :: c2.parents;
+    Compound f
+    | Term t2 -> let f =
+    {
+      parents = [];
+      value = c1.value -. t2.value;
+      expression = Sub (c1.expression, Num t2);
+      on_change = [];
+      needs_update = false;
+    } in
+    c1.parents <- Compound f :: c1.parents;
+    t2.parents <- Compound f :: t2.parents;
+    Compound f)
+  | Term t1 ->
+   (match f2 with
+    | Compound c2 -> let f =
+    {
+      parents = [];
+      value = t1.value -. c2.value;
+      expression = Sub (Num t1, c2.expression);
+      on_change = [];
+      needs_update = false;
+    } in
+    t1.parents <- Compound f :: t1.parents;
+    c2.parents <- Compound f :: c2.parents;
+    Compound f
+    | Term t2 -> let f =
+    {
+      parents = [];
+      value = t1.value -. t2.value;
+      expression = Sub (Num t1, Num t2);
+      on_change = [];
+      needs_update = false;
+    } in
+    t1.parents <- Compound f :: t1.parents;
+    t2.parents <- Compound f :: t2.parents;
+    Compound f)
+
+
+let (-.) = sub_form_float
+
+(* Multiplication of new types. *)
+let mul_form_float (f1: float formula) (f2: float formula): float formula = 
+  match f1 with
+  | Compound c1 ->
+   (match f2 with
+    | Compound c2 -> let f =
+    {
+      parents = [];
+      value = c1.value *. c2.value;
+      expression = Mul (c1.expression, c2.expression);
+      on_change = [];
+      needs_update = false;
+    } in
+    c1.parents <- Compound f :: c1.parents;
+    c2.parents <- Compound f :: c2.parents;
+    Compound f
+    | Term t2 -> let f =
+    {
+      parents = [];
+      value = c1.value *. t2.value;
+      expression = Mul (c1.expression, Num t2);
+      on_change = [];
+      needs_update = false;
+    } in
+    c1.parents <- Compound f :: c1.parents;
+    t2.parents <- Compound f :: t2.parents;
+    Compound f)
+  | Term t1 ->
+   (match f2 with
+    | Compound c2 -> let f =
+    {
+      parents = [];
+      value = t1.value *. c2.value;
+      expression = Mul (Num t1, c2.expression);
+      on_change = [];
+      needs_update = false;
+    } in
+    t1.parents <- Compound f :: t1.parents;
+    c2.parents <- Compound f :: c2.parents;
+    Compound f
+    | Term t2 -> let f =
+    {
+      parents = [];
+      value = t1.value *. t2.value;
+      expression = Mul (Num t1, Num t2);
+      on_change = [];
+      needs_update = false;
+    } in
+    t1.parents <- Compound f :: t1.parents;
+    t2.parents <- Compound f :: t2.parents;
+    Compound f)
+
+let ( *. ) = mul_form_float
+
+(* Division of new types. *)
+let div_form_float (f1: float formula) (f2: float formula): float formula = 
+  match f1 with
+  | Compound c1 ->
+   (match f2 with
+    | Compound c2 -> let f =
+    {
+      parents = [];
+      value = c1.value /. c2.value;
+      expression = Div (c1.expression, c2.expression);
+      on_change = [];
+      needs_update = false;
+    } in
+    c1.parents <- Compound f :: c1.parents;
+    c2.parents <- Compound f :: c2.parents;
+    Compound f
+    | Term t2 -> let f =
+    {
+      parents = [];
+      value = c1.value /. t2.value;
+      expression = Div (c1.expression, Num t2);
+      on_change = [];
+      needs_update = false;
+    } in
+    c1.parents <- Compound f :: c1.parents;
+    t2.parents <- Compound f :: t2.parents;
+    Compound f)
+  | Term t1 ->
+   (match f2 with
+    | Compound c2 -> let f =
+    {
+      parents = [];
+      value = t1.value /. c2.value;
+      expression = Div (Num t1, c2.expression);
+      on_change = [];
+      needs_update = false;
+    } in
+    t1.parents <- Compound f :: t1.parents;
+    c2.parents <- Compound f :: c2.parents;
+    Compound f
+    | Term t2 -> let f =
+    {
+      parents = [];
+      value = t1.value /. t2.value;
+      expression = Div (Num t1, Num t2);
+      on_change = [];
+      needs_update = false;
+    } in
+    t1.parents <- Compound f :: t1.parents;
+    t2.parents <- Compound f :: t2.parents;
+    Compound f)
+
+let (/.) = div_form_float
+
 
 (* Extraction methods. *)
 

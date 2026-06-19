@@ -37,5 +37,18 @@ val (-) : int formula -> int formula -> int formula
 val ( * ) : int formula -> int formula -> int formula
 val (/) : int formula -> int formula -> int formula
 
+(** Arithmetic for float terms. *)
+val add_form_float : float formula -> float formula -> float formula
+val sub_form_float : float formula -> float formula -> float formula
+val mul_form_float : float formula -> float formula -> float formula
+val div_form_float : float formula -> float formula -> float formula
+
+(** Shorthand arithmetic for terms. *)
+val (+.) : float formula -> float formula -> float formula
+val (-.) : float formula -> float formula -> float formula
+val ( *. ) : float formula -> float formula -> float formula
+val (/.) : float formula -> float formula -> float formula
+
+
 (** Event listener constructors *)
 val on_change : 'a formula -> (unit -> unit) -> unit
