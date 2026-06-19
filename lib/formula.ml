@@ -59,7 +59,7 @@ let set_needs_update (f: 'a formula) =
   | Compound c -> c.needs_update <- true
   | Term t -> ()
 
-let rec update_int_term (t: int term) (new_val: 'a): unit = 
+let rec update_int_term (t: int term) (new_val: int): unit = 
   (t.value <- new_val;
   List.iter set_needs_update t.parents;
   List.iter update_formula t.parents)
@@ -74,7 +74,7 @@ and update_formula (f: int formula) =
     else ())
   | Term t -> () (* Update formula on a term should do nothing because only update_term changes it. *)
 
-let rec update_float_term (t: float term) (new_val: 'a): unit = 
+let rec update_float_term (t: float term) (new_val: float): unit = 
   (t.value <- new_val;
   List.iter set_needs_update t.parents;
   List.iter update_formula t.parents)
