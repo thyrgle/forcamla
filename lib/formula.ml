@@ -550,9 +550,6 @@ let div_form_float (f1: float formula) (f2: float formula): float formula =
 
 let (/.) = div_form_float
 
-
-(* Extraction methods. *)
-
 (* Listeners *)
 let on_change (f: 'a formula) (g: unit -> unit) = match f with
   | Compound c -> c.on_change <- g :: c.on_change
