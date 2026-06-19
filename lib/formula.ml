@@ -1,6 +1,3 @@
-exception CastError of string
-exception UnsupportedType of string
-exception ExtractionError of string
 exception AssignmentError of string
 
 type 'a expr =
