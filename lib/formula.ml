@@ -1,4 +1,6 @@
 exception AssignmentError of string
+exception PredicateError of string
+exception NotPredicateError of string
 
 type 'a expr =
   Num of 'a term
@@ -6,29 +8,38 @@ type 'a expr =
 | Sub of 'a expr * 'a expr
 | Mul of 'a expr * 'a expr
 | Div of 'a expr * 'a expr
+| EqInt of int expr * int expr
+| EqFloat of float expr * float expr
+| NeInt of int expr * int expr
+| NeFloat of float expr * float expr
 and 'a term =
 {
   mutable parents: 'a formula list;
+  mutable pred_parents: bool formula list;
+  mutable when_satisfied: (unit -> unit) list;
   mutable on_change: (unit -> unit) list;
   mutable value: 'a;
 }
 and 'a compound =
 {
   mutable parents: 'a formula list;
+  mutable pred_parents: bool formula list;
+  mutable when_satisfied: (unit -> unit) list;
+  mutable on_change: (unit -> unit) list;
   mutable value: 'a;
   expression: 'a expr;
-  mutable on_change: (unit -> unit) list;
   mutable needs_update: bool;
 }
 and 'a formula = Compound of 'a compound | Term of 'a term
 
 let rec eval_expr_int (e: int expr): int =
   match e with
-    | Add (a, b) -> (eval_expr_int a) + (eval_expr_int b)
-    | Sub (a, b) -> (eval_expr_int a) - (eval_expr_int b)
-    | Mul (a, b) -> (eval_expr_int a) * (eval_expr_int b)
-    | Div (a, b) -> (eval_expr_int a) / (eval_expr_int b)
-    | Num x -> x.value
+    | Add (a, b)     -> (eval_expr_int a) + (eval_expr_int b)
+    | Sub (a, b)     -> (eval_expr_int a) - (eval_expr_int b)
+    | Mul (a, b)     -> (eval_expr_int a) * (eval_expr_int b)
+    | Div (a, b)     -> (eval_expr_int a) / (eval_expr_int b)
+    | Num x          -> x.value
+    | _              -> raise (NotPredicateError "Formula is type int, not a predicate")
 
 let rec eval_expr_float (e: float expr): float =
   match e with
@@ -36,8 +47,17 @@ let rec eval_expr_float (e: float expr): float =
     | Sub (a, b) -> (eval_expr_float a) -. (eval_expr_float b)
     | Mul (a, b) -> (eval_expr_float a) *. (eval_expr_float b)
     | Div (a, b) -> (eval_expr_float a) /. (eval_expr_float b)
-    | Num x -> x.value
-  
+    | Num x      -> x.value
+    | _          -> raise (NotPredicateError "Formula is type float, not a predicate")
+ 
+let eval_expr_bool (e: bool expr): bool =
+  match e with
+    | EqInt (a, b) -> (eval_expr_int a) = (eval_expr_int b)
+    | EqFloat (a, b) -> (eval_expr_float a) = (eval_expr_float b)
+    | NeInt (a, b) -> (eval_expr_int a) <> (eval_expr_int b)
+    | NeFloat (a, b) -> (eval_expr_float a) <> (eval_expr_float b)
+    | _ -> raise (PredicateError "Formula is a predicate cannot perform operation")
+
 let eval_int (f: int formula): int =
   match f with
   | Compound c ->
@@ -51,6 +71,14 @@ let eval_float (f: float formula): float =
   | Compound c ->
     (match c.needs_update with
     | true -> eval_expr_float c.expression
+    | false -> c.value)
+  | Term t -> t.value
+
+let eval_bool (f: bool formula): bool =
+  match f with
+  | Compound c ->
+    (match c.needs_update with
+    | true -> eval_expr_bool c.expression
     | false -> c.value)
   | Term t -> t.value
 
@@ -89,9 +117,23 @@ and update_formula (f: float formula) =
     else ())
   | Term t -> () (* Update formula on a term should do nothing because only update_term changes it. *)
 
-let it (value: int): int formula = Term { parents = []; on_change = []; value = value }
-let ft (value: float): float formula = Term { parents = []; on_change = []; value = value }
-let bt (value: bool): bool formula = Term { parents = []; on_change = []; value = value }
+let it (value: int): int formula = 
+  Term {
+    parents = [];
+    pred_parents = [];
+    on_change = [];
+    value = value;
+    when_satisfied = [];
+  }
+
+let ft (value: float): float formula = 
+  Term {
+    parents = [];
+    pred_parents = [];
+    on_change = [];
+    value = value;
+    when_satisfied = [];
+  }
 
 let (=:) (f: int formula) (value: int) = match f with
   | Compound c -> raise (AssignmentError "Cannot assign compound formula.")
@@ -114,7 +156,15 @@ let (!) (f: 'a formula) = match f with
 (* Arithmetic functions. *)
 
 let formula_create (e: 'a expr) (value: 'a) =
-  { parents = []; value = value; on_change = []; needs_update = false; expression = e }
+{ 
+  parents = []; 
+  value = value;
+  on_change = [];
+  needs_update = false; 
+  expression = e; 
+  pred_parents = [];
+  when_satisfied = [];
+}
 
 (* Addition of int typed formula. *)
 let add_form_int (f1: int formula) (f2: int formula): int formula =
@@ -325,7 +375,63 @@ let div_form_float (f1: float formula) (f2: float formula): float formula =
 
 let (/.) = div_form_float
 
+(* Equality of new types. (Only supports two int formulas) *)
+let eq_form_int (f1: int formula) (f2: int formula): bool formula =
+  match (f1, f2) with
+  | (Compound c1, Compound c2) -> 
+      let f = formula_create (EqInt (c1.expression, c2.expression)) (c1.value = c2.value) in
+      c1.pred_parents <- Compound f :: c1.pred_parents;
+      c2.pred_parents <- Compound f :: c2.pred_parents;
+      Compound f
+  | (Compound c1, Term t2) ->
+      let f = formula_create (EqInt (c1.expression, Num t2)) (c1.value = t2.value) in
+      c1.pred_parents <- Compound f :: c1.pred_parents;
+      t2.pred_parents <- Compound f :: t2.pred_parents;
+      Compound f
+  | (Term t1, Compound c2) ->
+      let f = formula_create (EqInt (Num t1, c2.expression)) (t1.value = c2.value) in
+      t1.pred_parents <- Compound f :: t1.pred_parents;
+      c2.pred_parents <- Compound f :: c2.pred_parents;
+      Compound f
+    | (Term t1, Term t2) ->
+       let f = formula_create (EqInt (Num t1, Num t2)) (t1.value = t2.value) in
+       t1.pred_parents <- Compound f :: t1.pred_parents;
+       t2.pred_parents <- Compound f :: t2.pred_parents;
+       Compound f
+
+let (=?) = eq_form_int
+
+let eq_form_float (f1: float formula) (f2: float formula): bool formula =
+  match (f1, f2) with
+  | (Compound c1, Compound c2) -> 
+      let f = formula_create (EqFloat (c1.expression, c2.expression)) (c1.value = c2.value) in
+      c1.pred_parents <- Compound f :: c1.pred_parents;
+      c2.pred_parents <- Compound f :: c2.pred_parents;
+      Compound f
+  | (Compound c1, Term t2) ->
+      let f = formula_create (EqFloat (c1.expression, Num t2)) (c1.value = t2.value) in
+      c1.pred_parents <- Compound f :: c1.pred_parents;
+      t2.pred_parents <- Compound f :: t2.pred_parents;
+      Compound f
+  | (Term t1, Compound c2) ->
+      let f = formula_create (EqFloat (Num t1, c2.expression)) (t1.value = c2.value) in
+      t1.pred_parents <- Compound f :: t1.pred_parents;
+      c2.pred_parents <- Compound f :: c2.pred_parents;
+      Compound f
+    | (Term t1, Term t2) ->
+       let f = formula_create (EqFloat (Num t1, Num t2)) (t1.value = t2.value) in
+       t1.pred_parents <- Compound f :: t1.pred_parents;
+       t2.pred_parents <- Compound f :: t2.pred_parents;
+       Compound f
+
+let (=.) = eq_form_int
+
+
 (* Listeners *)
 let on_change (f: 'a formula) (g: unit -> unit) = match f with
   | Compound c -> c.on_change <- g :: c.on_change
   | Term t -> t.on_change <- g :: t.on_change
+
+let when_satisfied (f: bool formula) (g: unit -> unit) = match f with
+  | Compound c -> c.when_satisfied <- g :: c.when_satisfied
+  | Term t -> t.when_satisfied <- g :: t.when_satisfied
