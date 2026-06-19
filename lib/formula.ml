@@ -107,6 +107,10 @@ let (=::.) (f: float formula) (value: float formula) = match f with
   | Compound c -> raise (AssignmentError "Cannot assign compound formula.")
   | Term t -> update_float_term t (eval_float value)
 
+(* Extract values. Basically the same as (!) for reference types. *)
+let (!) (f: 'a formula) = match f with
+  | Compound c -> c.value
+  | Term t -> t.value
 
 (* Arithmetic functions. *)
 
@@ -551,7 +555,3 @@ let (/.) = div_form_float
 let on_change (f: 'a formula) (g: unit -> unit) = match f with
   | Compound c -> c.on_change <- g :: c.on_change
   | Term t -> t.on_change <- g :: t.on_change
-
-let (!) (f: 'a formula) = match f with
-  | Compound c -> c.value
-  | Term t -> t.value
