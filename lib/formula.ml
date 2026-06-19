@@ -87,33 +87,48 @@ let set_needs_update (f: 'a formula) =
   | Compound c -> c.needs_update <- true
   | Term t -> ()
 
+let update_formula_bool (f: bool formula) =
+  match f with
+  | Compound c ->
+    let old_val = c.value in
+    let new_val = eval_bool f in
+    if old_val <> new_val then
+      (c.value <- new_val;
+      List.iter (fun g -> g ()) c.on_change;
+      (if new_val = true then (List.iter (fun g -> g ()) c.when_satisfied) else ()))
+    else ()
+  | Term t -> () (* Update formula on a term should do nothing because only update_term changes it. *)
+
 let rec update_int_term (t: int term) (new_val: int): unit = 
-  (t.value <- new_val;
+  t.value <- new_val;
   List.iter set_needs_update t.parents;
-  List.iter update_formula t.parents)
-and update_formula (f: int formula) =
+  List.iter update_formula_int t.parents;
+  List.iter update_formula_bool t.pred_parents
+and update_formula_int (f: int formula) =
   match f with
   | Compound c ->
     (let old_val = c.value in
     let new_val = eval_int f in
     if old_val <> new_val then
       (c.value <- new_val;
-      List.iter update_formula c.parents)
+      List.iter update_formula_int c.parents)
     else ())
   | Term t -> () (* Update formula on a term should do nothing because only update_term changes it. *)
 
 let rec update_float_term (t: float term) (new_val: float): unit = 
-  (t.value <- new_val;
+  t.value <- new_val;
   List.iter set_needs_update t.parents;
-  List.iter update_formula t.parents)
-and update_formula (f: float formula) =
+  List.iter update_formula_float t.parents;
+  List.iter update_formula_bool t.pred_parents
+and update_formula_float (f: float formula) =
   match f with
   | Compound c ->
     (let old_val = c.value in
     let new_val = eval_float f in
     if old_val <> new_val then
       (c.value <- new_val;
-      List.iter update_formula c.parents)
+      List.iter (fun g -> g ()) c.on_change;
+      List.iter update_formula_float c.parents)
     else ())
   | Term t -> () (* Update formula on a term should do nothing because only update_term changes it. *)
 
