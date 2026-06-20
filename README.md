@@ -72,4 +72,4 @@ let _ = player.health =:: (player.health - 1) (* Now something happens! player.h
 
 ## Documentation
 
-More examples and an API reference can be found here. (TODO)
+More examples and an API reference can be found [here.](https://thyrgle.github.io/forcamla/)
