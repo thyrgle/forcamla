@@ -102,6 +102,7 @@ let update_formula_bool (f: bool formula) =
 let rec update_int_term (t: int term) (new_val: int): unit = 
   t.value <- new_val;
   List.iter set_needs_update t.parents;
+  List.iter set_needs_update t.pred_parents;
   List.iter update_formula_int t.parents;
   List.iter update_formula_bool t.pred_parents
 and update_formula_int (f: int formula) =
@@ -111,13 +112,18 @@ and update_formula_int (f: int formula) =
     let new_val = eval_int f in
     if old_val <> new_val then
       (c.value <- new_val;
-      List.iter update_formula_int c.parents)
+      List.iter (fun g -> g ()) c.on_change;
+      List.iter set_needs_update c.parents;
+      List.iter set_needs_update c.pred_parents;
+      List.iter update_formula_int c.parents;
+      List.iter update_formula_bool c.pred_parents)
     else ())
   | Term t -> () (* Update formula on a term should do nothing because only update_term changes it. *)
 
 let rec update_float_term (t: float term) (new_val: float): unit = 
   t.value <- new_val;
   List.iter set_needs_update t.parents;
+  List.iter set_needs_update t.pred_parents;
   List.iter update_formula_float t.parents;
   List.iter update_formula_bool t.pred_parents
 and update_formula_float (f: float formula) =
@@ -128,6 +134,8 @@ and update_formula_float (f: float formula) =
     if old_val <> new_val then
       (c.value <- new_val;
       List.iter (fun g -> g ()) c.on_change;
+      List.iter set_needs_update c.parents;
+      List.iter set_needs_update c.pred_parents;
       List.iter update_formula_float c.parents)
     else ())
   | Term t -> () (* Update formula on a term should do nothing because only update_term changes it. *)
@@ -439,8 +447,7 @@ let eq_form_float (f1: float formula) (f2: float formula): bool formula =
        t2.pred_parents <- Compound f :: t2.pred_parents;
        Compound f
 
-let (=.) = eq_form_int
-
+let (=.) = eq_form_float
 
 (* Listeners *)
 let on_change (f: 'a formula) (g: unit -> unit) = match f with

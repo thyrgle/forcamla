@@ -107,6 +107,26 @@ let test_term_form_update () =
   x =:: (x + it 1); 
   (check int) "same int" 12 !w
 
+let test_simple_eq_no_change () =
+  let x = it 1 in
+  let y = x =? (it 0) in
+  (check bool) "same bool" false !y
+
+let test_simple_eq () =
+  let x = it 1 in
+  let y = x =? (it 0) in
+  x =:: (x - it 1);
+  (check bool) "same bool" true !y
+
+let test_simple_sat () =
+  let x = it 1 in
+  let y = x =? (it 0) in
+  let z = ref 1 in
+  when_satisfied y (fun () : unit -> (z := 2));
+  x =:: (x - it 1);
+  (check int) "same int" 2 z.contents
+
+
 let () =
   run "Utils" [
       "simple", [
@@ -128,5 +148,12 @@ let () =
         test_case "Formula + term formula (float)" `Quick test_term_form_expr_float;
         test_case "Complex update" `Quick test_complex_update;
         test_case "Formula + term update" `Quick test_term_form_update;
+      ];
+      "simple-equations", [
+        test_case "Simple equation (no update)" `Quick test_simple_eq_no_change;
+        test_case "Simple equation" `Quick test_simple_eq;
+      ];
+      "event-listeners", [
+        test_case "Simple when_satisfied" `Quick test_simple_sat;
       ];
   ]

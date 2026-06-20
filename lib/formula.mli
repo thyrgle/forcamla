@@ -49,6 +49,14 @@ val (-.) : float formula -> float formula -> float formula
 val ( *. ) : float formula -> float formula -> float formula
 val (/.) : float formula -> float formula -> float formula
 
+(** Simple predicate constructors. *)
+val eq_form_int : int formula -> int formula -> bool formula
+val eq_form_float : float formula -> float formula -> bool formula
+
+(** Shorthand predicate constructors. *)
+val (=?) : int formula -> int formula -> bool formula
+val (=.) : float formula -> float formula -> bool formula
 
 (** Event listener constructors *)
 val on_change : 'a formula -> (unit -> unit) -> unit
+val when_satisfied : bool formula -> (unit -> unit) -> unit
