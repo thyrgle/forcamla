@@ -44,7 +44,7 @@ open Formula
 type hero =
 {
   (* A bunuch of fields *)
-  health: formula
+  health: int formula
 }
 
 let player =
