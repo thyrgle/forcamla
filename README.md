@@ -53,7 +53,7 @@ let player =
   health = it 3; (* Give health a value of something, say 3 in this case. *)
 }
 ```
-In most games, when the `player` health is `0` that means "Game Over!". So, we first make a "Game Over!" function:
+In most games, when the `player.health` is `0` that means "Game Over!". So, we first make a "Game Over!" function:
 ```ocaml
 let game_over () = print_endline "Game Over!"
 ```
