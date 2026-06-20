@@ -62,7 +62,7 @@ Then, with the power of `forcamla` we can create an *event listener* (see the [M
 let _ = when_satisfied (player.health =? 0) game_over
 ```
 
-`=?` is used to check if an integer formula is equal to another (integer) formula. Thus, this reads as: "When `player.health` is `0` fire the function `game_over`. Therfore, if we run:
+`=?` is used to check if an integer formula is equal to another (integer) formula. This reads as: "When `player.health` is `0` fire the function `game_over`". Therfore, if we run:
 
 ```ocaml
 let _ = player.health =:: (player.health - 1) (* Nothing happens yet! player.health is 2 now. *)
