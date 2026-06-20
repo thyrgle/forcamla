@@ -55,7 +55,7 @@ let player =
 ```
 In most games, when the `player` health is `0` that means "Game Over!". So, we first make a "Game Over!" function:
 ```ocaml
-let game_over () = print_line "Game Over!"
+let game_over () = print_endline "Game Over!"
 ```
 Then, with the power of `forcamla` we can create an *event listener* (see the [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) to understand what an event listener is) to execute `game_over` when the player health is `0`. Observe
 ```ocaml
