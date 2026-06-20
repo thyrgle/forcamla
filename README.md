@@ -59,15 +59,15 @@ let game_over () = print_endline "Game Over!"
 ```
 Then, with the power of `forcamla` we can create an *event listener* (see the [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) to understand what an event listener is) to execute `game_over` when the player health is `0`. Observe
 ```ocaml
-let _ = when_satisfied (player.health =? 0) game_over
+let () = when_satisfied (player.health =? 0) game_over
 ```
 
 `=?` is used to check if an integer formula is equal to another (integer) formula. This reads as: "When `player.health` is `0` fire the function `game_over`". Therfore, if we run:
 
 ```ocaml
-let _ = player.health =:: (player.health - 1) (* Nothing happens yet! player.health is 2 now. *)
-let _ = player.health =:: (player.health - 1) (* Nothing happens yet! player health is 1 now. *)
-let _ = player.health =:: (player.health - 1) (* Now something happens! player.health is 0 and "Game Over!" is printed to the screen! *)
+let () = player.health =:: (player.health - 1) (* Nothing happens yet! player.health is 2 now. *)
+let () = player.health =:: (player.health - 1) (* Nothing happens yet! player health is 1 now. *)
+let () = player.health =:: (player.health - 1) (* Now something happens! player.health is 0 and "Game Over!" is printed to the screen! *)
 ```
 
 ## Documentation
