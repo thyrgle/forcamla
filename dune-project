@@ -13,7 +13,7 @@
 
 (license LICENSE)
 
-(documentation https://url/to/documentation)
+(documentation https://thyrgle.github.io/forcamla/)
 
 (package
  (name forcamla)
