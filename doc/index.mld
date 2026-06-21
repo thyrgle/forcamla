@@ -29,9 +29,9 @@ x := 3
 
 What happens to [z]? Does [z] change to reflect the fact that [x] changed? Or does [z] stay the same? Most languages (including OCaml) do not update [z] when [x] changes. This might defy your intuition. Even worse, this behavior may be inconvenient to deal with. This is where [forcamla] comes into play!
 
-{1 Formula}
+{2 Formulae}
 
-[forcamla] introduces a [formula] type that behaves similarly to [ref] types {i but} formula stay {i up-to-date} when their [term]s change. Modifying the example above we have
+[forcamla] introduces a [formula] type that behaves similarly to [ref] types {i but} [formula] stay {i up-to-date} when their subformulas change. Modifying the example above we have
 
 {[
 open Formula (* To use formula *)
