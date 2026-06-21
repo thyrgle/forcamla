@@ -1,4 +1,4 @@
-(** The fundamental types: terms (ref with superpowers!) and formula (combined terms). **)
+(** The fundamental types: terms (ref with superpowers!) and formula (combined terms). *)
 
 (** A combination of terms that represent a mathematical formula *)
 type 'a formula
