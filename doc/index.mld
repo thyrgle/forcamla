@@ -31,7 +31,7 @@ What happens to [z]? Does [z] change to reflect the fact that [x] changed? Or do
 
 {1 Formula}
 
-[forcamla] introduces a [formula] type that behaves similarly to [ref] types *but* formula stay *up-to-date* when their [term]s change. Modifying the example above we have
+[forcamla] introduces a [formula] type that behaves similarly to [ref] types {i but} formula stay {i up-to-date} when their [term]s change. Modifying the example above we have
 
 {[
 open Formula (* To use formula *)
@@ -70,13 +70,13 @@ In most games, when the [player.health] is [0] that means "Game Over!". So, we f
 let game_over () = print_endline "Game Over!"
 ]}
 
-Then, with the power of [forcamla] we can create an *event listener* (see the {{: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener }MDN documentation } to understand what an event listener is) to execute [game_over] when the [player.health] is [0]. Observe
+Then, with the power of [forcamla] we can create an {i event listener} (see the {{: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener }MDN documentation } to understand what an event listener is) to execute [game_over] when the [player.health] is [0]. Observe
 
 {[
 let () = when_satisfied (player.health =? 0) game_over
 ]}
 
-[=?] is used to check if an integer formula is equal to another (integer) formula. This reads as: "When [player.health] is [0] (i.e. *when* the formula is *satisfied*!) fire the function [game_over]". Therfore, if we run:
+[=?] is used to check if an integer formula is equal to another (integer) formula. This reads as: "When [player.health] is [0] (i.e. {i when} the formula is {i satisfied}!) fire the function [game_over]". Therfore, if we run:
 
 {[
 let () = player.health =:: (player.health - 1) (* Nothing happens yet! player.health is 2 now. *)
