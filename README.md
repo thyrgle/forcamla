@@ -72,4 +72,4 @@ let () = player.health =:: (player.health - 1) (* Now something happens! player.
 
 ## Documentation
 
-More examples and an API reference can be found [here.](https://thyrgle.github.io/forcamla/)
+More examples and an API reference can be found [here.](https://thyrgle.github.io/forcamla/forcamla/index.html)
