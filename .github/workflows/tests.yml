@@ -1,0 +1,20 @@
+# Simple workflow for deploying static content to GitHub Pages
+name: Tests for forcamla
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["master"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup dune
+        uses: nmittu/setup-dune@v2
+      - name: Build docs
+        run: |
+          eval $(opam config env)
+          dune test
