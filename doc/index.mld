@@ -15,7 +15,7 @@ simply defines an integer constant [x] that has the value [2] and we later use [
 
 {[
 let x = ref 2 (* Let x be a *variable* that contains 2 *)
-x := x + 1 (* Update x so it is now x + 1 = 2 + 1 = 3 *)
+x := !x + 1 (* Update x so it is now x + 1 = 2 + 1 = 3 *)
 ]}
 
 However, even this has it limitations. Suppose we have the following scenario

@@ -11,7 +11,7 @@ let z = x * x
 simply defines an integer constant `x` that has the value `2` and we later use `x` again to make `z` have the value of `x * x = 2 * 2 = 4`. But often in programming constants are not enough because we want to change the values these names have after a sequence of instructions. Thus, OCaml has `ref` types for this, observe
 ```ocaml
 let x = ref 2 (* Let x be a *variable* that contains 2 *)
-x := x + 1 (* Update x so it is now x + 1 = 2 + 1 = 3 *)
+x := !x + 1 (* Update x so it is now x + 1 = 2 + 1 = 3 *)
 ```
 However, even this has it limitations. Suppose we have the following scenario
 ```ocaml
