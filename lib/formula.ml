@@ -8,7 +8,6 @@ type 'a expr =
 | Div of 'a expr * 'a expr
 and 'a term =
 {
-  mutable when_satisfied: (unit -> unit) list;
   mutable value: 'a;
 }
 and 'a formula =
@@ -144,11 +143,7 @@ and update_int_formula (f: int formula) = update_a_formula eval_expr_int f
 let rec update_float_term (t: float formula) (new_val: float): unit = update_a_term eval_expr_float t new_val
 and update_float_formula (f: float formula) = update_a_formula eval_expr_float f
 
-let create_term (value: 'a): 'a term =
-{
-  value = value;
-  when_satisfied = [];
-}
+let create_term (value: 'a): 'a term = { value = value; }
 
 let create_formula (t: 'a term): 'a formula =
 {
