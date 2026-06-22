@@ -2,6 +2,8 @@
 
 (** A combination of terms that represent a mathematical formula *)
 type 'a formula
+type equation
+type system
 
 (** Lift basic types to term types. *)
 val t : 'a -> 'a formula
@@ -12,13 +14,17 @@ val t : 'a -> 'a formula
 val (=:) : int formula -> int -> unit
 (** Update a float term to a new value. *)
 val (=:.) : float formula -> float -> unit
-(** Update a term by evaluating a formula *)
-val (=::) : int formula -> int formula -> unit
 
 (** Extraction of the (current) value for a term or formula. *)
 
-(** Get current value of formula. Similar to (!) for ref types. *)
+(** Get current value of a formula. Similar to (!) for ref types. *)
 val (!) : 'a formula -> 'a
+
+(** Get current value of an equation. Similar to (!) for ref types. *)
+val (!!) : equation -> bool
+
+(** Get current value of a system. Similar to (!) for ref types. *)
+val (&) : system -> bool
 
 (** Formula creation methods. *)
 
@@ -80,24 +86,24 @@ val (/.) : float formula -> float formula -> float formula
 
 (** Simple predicate constructors. *)
 
-(** Create a bool formula that determines if two int formula are equal. *)
-val eq_form_int : int formula -> int formula -> bool formula
+(** Create an equation that determines if two int formula are equal. *)
+val eq_form_int : int formula -> int formula -> equation
 
-(** Create a bool formula that determines if two float formula are equal. *)
-val eq_form_float : float formula -> float formula -> bool formula
+(** Create an equation that determines if two float formula are equal. *)
+val eq_form_float : float formula -> float formula -> equation
 
 (** Shorthand predicate constructors. *)
 
-(** Shorthand for creating a bool formula that determines if two int formulas are equal. *)
-val (=?) : int formula -> int formula -> bool formula
+(** Shorthand for creating a equation that determines if two int formulas are equal. *)
+val (=?) : int formula -> int formula -> equation
 
 (** Shorthand for creating a bool formula that determines if two float formulas are equal. *)
-val (=.) : float formula -> float formula -> bool formula
+val (=.) : float formula -> float formula -> equation
 
 (** Event listener constructors *)
 
 (** Listen and execute a function when a formula changes value. *)
 val on_change : 'a formula -> (unit -> unit) -> unit
 
-(** Listen and execute when a predicate (boolean formula) becomes true *)
-val when_satisfied : bool formula -> (unit -> unit) -> unit
+(** Listen and execute when an equation becomes true *)
+val when_satisfied : equation -> (unit -> unit) -> unit

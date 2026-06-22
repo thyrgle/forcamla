@@ -91,39 +91,39 @@ let test_term_form_expr_float () =
 
 let test_simple_inc () =
   let x = t 2 in
-  x =:: (x + t 1);
+  x =: !(x + t 1);
   (check int) "same int" 3 !x
 
 let test_complex_update () =
   let x = t 2 in
   let z = x * x in
-  x =:: (x + t 1); 
+  x =: !(x + t 1); 
   (check int) "same int" 9 !z
 
 let test_term_form_update () =
   let x = t 2 in
   let y = x + (t 1) in
   let w = x * y in
-  x =:: (x + t 1); 
+  x =: !(x + t 1); 
   (check int) "same int" 12 !w
 
 let test_simple_eq_no_change () =
   let x = t 1 in
   let y = x =? (t 0) in
-  (check bool) "same bool" false !y
+  (check bool) "same bool" false !!y
 
 let test_simple_eq () =
   let x = t 1 in
   let y = x =? (t 0) in
-  x =:: (x - t 1);
-  (check bool) "same bool" true !y
+  x =: !(x - t 1);
+  (check bool) "same bool" true !!y
 
 let test_simple_sat () =
   let x = t 1 in
   let y = x =? (t 0) in
   let z = ref 1 in
   when_satisfied y (fun () : unit -> (z := 2));
-  x =:: (x - t 1);
+  x =: !(x - t 1);
   (check int) "same int" 2 z.contents
 
 
