@@ -14,7 +14,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup dune
         uses: nmittu/setup-dune@v2
-      - name: Build docs
+      - name: Run tests.
         run: |
           eval $(opam config env)
+          opam install alcotest
           dune test
