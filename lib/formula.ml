@@ -108,14 +108,13 @@ and update_a_formula (eval: 'a expr -> 'a) (f: 'a formula) =
     else ())
   | Term t -> () (* Update formula on a term should do nothing because only update_term changes it. *)
 
-
 let rec update_int_term (t: int term) (new_val: int): unit = update_a_term eval_expr_int t new_val
 and update_int_formula (f: int formula) = update_a_formula eval_expr_int f
 
 let rec update_float_term (t: float term) (new_val: float): unit = update_a_term eval_expr_float t new_val
 and update_int_formula (f: float formula) = update_a_formula eval_expr_float f
 
-let it (value: int): int formula = 
+let at (value: 'a): 'a formula =
   Term {
     parents = [];
     pred_parents = [];
@@ -123,15 +122,8 @@ let it (value: int): int formula =
     value = value;
     when_satisfied = [];
   }
-
-let ft (value: float): float formula = 
-  Term {
-    parents = [];
-    pred_parents = [];
-    on_change = [];
-    value = value;
-    when_satisfied = [];
-  }
+let it (value: int): int formula = at value
+let ft (value: float): float formula = at value
 
 let (=:) (f: int formula) (value: int) = match f with
   | Compound c -> raise (AssignmentError "Cannot assign compound formula.")
