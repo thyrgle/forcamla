@@ -28,8 +28,8 @@ What happens to `z`? Does `z` change to reflect the fact that `x` changed? Or do
 ```ocaml
 open Formula (* To use formula *)
 
-let x = it 2 (* Create an integer term called x *)
-let y = it 2 (* Create an integer term called y *)
+let x = t 2 (* Create an integer term called x *)
+let y = t 2 (* Create an integer term called y *)
 let z = x + y
 x =:: 3 (* Set x to 3, and z now is 5 *)
 ```
@@ -50,7 +50,7 @@ type hero =
 let player =
 {
   (* Assign the fields *)
-  health = it 3; (* Give health a value of something, say 3 in this case. *)
+  health = t 3; (* Give health a value of something, say 3 in this case. *)
 }
 ```
 In most games, when the `player.health` is `0` that means "Game Over!". So, we first make a "Game Over!" function:
