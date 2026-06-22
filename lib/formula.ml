@@ -76,28 +76,25 @@ let set_formula_needs_update (f: 'a formula) = f.needs_update <- true
 let set_equation_needs_update (eq: equation) = eq.needs_update <- true
 let set_system_needs_update (s: system) = s.needs_update <- true
 
-let rec update_a_term (eval: 'a expr -> 'a) (f: 'a formula) (new_val: 'a) =
+let rec propegate (eval: 'a expr -> 'a) (f: 'a formula) =
+  List.iter (fun g -> g ()) f.on_change;
+  List.iter set_formula_needs_update f.parents;
+  List.iter set_equation_needs_update f.pred_parents;
+  List.iter (update_a_formula eval) f.parents;
+  List.iter update_equation f.pred_parents
+and update_a_term (eval: 'a expr -> 'a) (f: 'a formula) (new_val: 'a) =
   match f.expression with
   | Num t ->
       if t.value <> new_val then
      (t.value <- new_val;
       f.value <- new_val;
-      List.iter set_formula_needs_update f.parents;
-      List.iter set_equation_needs_update f.pred_parents;
-      List.iter (update_a_formula eval) f.parents;
-      List.iter update_equation f.pred_parents;
-      List.iter (fun g -> g ()) f.on_change) else ()
+      propegate eval f) else ()
   | _ -> raise (NotATermException "Formula is not a term and cannot be reassigned.")
 and update_a_formula (eval: 'a expr -> 'a) (f: 'a formula) =
   let new_val = eval_type eval f in
   if f.value <> new_val then
     (f.value <- new_val;
-    List.iter (fun g -> g ()) f.on_change;
-    List.iter set_formula_needs_update f.parents;
-    List.iter set_equation_needs_update f.pred_parents;
-    List.iter (update_a_formula eval) f.parents;
-    List.iter update_equation f.pred_parents)
-    else ()
+     propegate eval f) else ()
 and update_equation (eq: equation): unit =
   match eq.expression with
   | EqInt (a, b) -> let new_val = (eval_int a) = (eval_int b) in
