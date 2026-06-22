@@ -4,12 +4,7 @@
 type 'a formula
 
 (** Lift basic types to term types. *)
-
-(** Create term from float. *)
-val ft : float -> float formula
-
-(** Create term from int. *)
-val it : int -> int formula
+val t : 'a -> 'a formula
 
 (** Update term methods. *)
 
