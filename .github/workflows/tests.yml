@@ -17,5 +17,5 @@ jobs:
       - name: Run tests.
         run: |
           eval $(opam config env)
-          opam install alcotest
+          opam install alcotest --yes
           dune test
