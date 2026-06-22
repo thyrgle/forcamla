@@ -58,29 +58,17 @@ let eval_expr_bool (e: bool expr): bool =
     | NeFloat (a, b) -> (eval_expr_float a) <> (eval_expr_float b)
     | _ -> raise (PredicateError "Formula is a predicate cannot perform operation")
 
-let eval_int (f: int formula): int =
+let eval_type (eval: 'a expr -> 'a) (f: 'a formula): 'a =
   match f with
   | Compound c ->
     (match c.needs_update with
-    | true -> eval_expr_int c.expression
+    | true -> eval c.expression
     | false -> c.value)
   | Term t -> t.value
 
-let eval_float (f: float formula): float =
-  match f with
-  | Compound c ->
-    (match c.needs_update with
-    | true -> eval_expr_float c.expression
-    | false -> c.value)
-  | Term t -> t.value
-
-let eval_bool (f: bool formula): bool =
-  match f with
-  | Compound c ->
-    (match c.needs_update with
-    | true -> eval_expr_bool c.expression
-    | false -> c.value)
-  | Term t -> t.value
+let eval_int (f: int formula): int = eval_type eval_expr_int f
+let eval_float (f: float formula): float = eval_type eval_expr_float f
+let eval_bool (f: bool formula): bool = eval_type eval_expr_bool f
 
 let set_needs_update (f: 'a formula) =
   match f with
