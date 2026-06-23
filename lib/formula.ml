@@ -1,11 +1,14 @@
+(* Needed for trying to assign a complex formula a value. *)
 exception NotATermException of string
 
+(* Stores the arithmetic expression of a formula. *)
 type 'a expr =
   Num of 'a ref
 | Add of 'a expr * 'a expr
 | Sub of 'a expr * 'a expr
 | Mul of 'a expr * 'a expr
 | Div of 'a expr * 'a expr
+(* Basically 'a expr, but with some additional fields for updating. *)
 and 'a formula =
 {
   mutable parents: 'a formula list;
@@ -15,11 +18,13 @@ and 'a formula =
   expression: 'a expr;
   mutable needs_update: bool;
 }
+(* Similar to 'a expr but for equations instead of formula. *)
 and equation_expr =
 | EqInt of int formula * int formula
 | EqFloat of float formula * float formula
 | NeInt of int formula * int formula
 | NeFloat of float formula * float formula
+(* Similar to 'a expr and equation_expr but for systems of equations. *)
 and system_expr =
 | AndEq of equation * equation
 | OrEq of equation * equation
@@ -29,6 +34,7 @@ and system_expr =
 | OrSE of system * equation
 | AndES of equation * system
 | OrES of equation * system
+(* A wrapper around equation_expr to allow for updating. *)
 and equation =
 {
   mutable parents: system list;
@@ -38,6 +44,7 @@ and equation =
   expression: equation_expr;
   mutable needs_update: bool;
 }
+(* A wrapper around system_expr to allow for updating. *)
 and system =
 {
   mutable parents: system list;
@@ -48,6 +55,7 @@ and system =
   mutable needs_update: bool;
 }
 
+(* Evaluate what an int expr currently should be. *)
 let rec eval_expr_int (e: int expr): int =
   match e with
     | Add (a, b)     -> (eval_expr_int a) + (eval_expr_int b)
@@ -56,6 +64,7 @@ let rec eval_expr_int (e: int expr): int =
     | Div (a, b)     -> (eval_expr_int a) / (eval_expr_int b)
     | Num x          -> !x
 
+(* Evaluate what an float expr currently should be. *)
 let rec eval_expr_float (e: float expr): float =
   match e with
     | Add (a, b) -> (eval_expr_float a) +. (eval_expr_float b)
@@ -63,11 +72,14 @@ let rec eval_expr_float (e: float expr): float =
     | Mul (a, b) -> (eval_expr_float a) *. (eval_expr_float b)
     | Div (a, b) -> (eval_expr_float a) /. (eval_expr_float b)
     | Num x      -> !x
- 
+
+(* Evaluate a type *but* avoid unneeded updates with caching *)
 let eval_type (eval: 'a expr -> 'a) (f: 'a formula): 'a = if f.needs_update then eval f.expression else f.value
 
+(* Specialization of the above "smart" evaluation. *)
 let eval_int (f: int formula): int = eval_type eval_expr_int f
 let eval_float (f: float formula): float = eval_type eval_expr_float f
+
 let eval_equation (eq: equation): bool = match eq.expression with
 | EqInt (a, b) -> (eval_int a) = (eval_int b)
 | EqFloat (a, b) -> (eval_float a) = (eval_float b)
@@ -157,15 +169,13 @@ and update_system (s: system): unit =
     if new_val <> s.value then
       (s.value <- new_val; propegate_system s)
 
-
-
-
 let rec update_int_term (t: int formula) (new_val: int): unit = update_a_term eval_expr_int t new_val
 and update_int_formula (f: int formula) = update_a_formula eval_expr_int f
 
 let rec update_float_term (t: float formula) (new_val: float): unit = update_a_term eval_expr_float t new_val
 and update_float_formula (f: float formula) = update_a_formula eval_expr_float f
 
+(* Construct a formula of a single term. *)
 let t (value: 'a): 'a formula =
 {
   parents = [];
@@ -176,6 +186,7 @@ let t (value: 'a): 'a formula =
   needs_update = false;
   }
 
+(* Shorthand for update methods. *)
 let (=:) = update_int_term
 let (=:.) = update_float_term
 
@@ -186,16 +197,18 @@ let (&) (s: system) = s.value
 
 (* Arithmetic functions. *)
 
+(* Similar to the [t] function above, but needed for creating compound formulas (of multiple terms and binary ops. *)
 let formula_create (e: 'a expr) (value: 'a) =
 { 
   parents = []; 
   value = value;
   on_change = [];
   needs_update = false; 
-  expression = e; 
+  expression = e;
   pred_parents = [];
 }
 
+(* Create a binary operation that merges two formula into a more complex one. *)
 let bin_form_a (op: 'a -> 'a -> 'a) (mk_expr: 'a expr -> 'a expr -> 'a expr) (f1: 'a formula) (f2: 'a formula): 'a formula =
   let f = formula_create (mk_expr f1.expression f2.expression) (op f1.value f2.value) in
   f1.parents <- f :: f1.parents;
