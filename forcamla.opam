@@ -5,7 +5,7 @@ description:
   "Formulas are either terms or compound statements (terms combined with binary operators). Terms may be updated and then compound statements will reflect the changed updated terms. With this event listeners can be constructed that wait for formulas to be satisfied, changed, etc."
 maintainer: ["Christopher Sumnicht <csumnicht@berkeley.edu>"]
 authors: ["Christopher Sumnicht <csumnicht@berkeley.edu>"]
-license: "LICENSE"
+license: "Apache-2.0"
 tags: ["mathematical programming" "formula" "event listeners"]
 homepage: "https://github.com/thyrgle/forcamla"
 doc: "https://thyrgle.github.io/forcamla/"

@@ -11,7 +11,7 @@
 
 (maintainers "Christopher Sumnicht <csumnicht@berkeley.edu>")
 
-(license LICENSE)
+(license Apache-2.0)
 
 (documentation https://thyrgle.github.io/forcamla/)
 
