@@ -12,9 +12,9 @@ homepage: "https://github.com/thyrgle/forcamla"
 doc: "https://thyrgle.github.io/forcamla/"
 bug-reports: "https://github.com/thyrgle/forcamla/issues"
 depends: [
-  "dune" {>= "3.23"}
   "ocaml" {>= "5.0.0"}
-  "alcotest" {>= "1.9.1"}
+  "dune" {>= "3.23"}
+  "alcotest" {with-test}
   "odoc" {with-doc}
 ]
 build: [
