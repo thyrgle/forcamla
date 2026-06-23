@@ -175,16 +175,20 @@ and update_int_formula (f: int formula) = update_a_formula eval_expr_int f
 let rec update_float_term (t: float formula) (new_val: float): unit = update_a_term eval_expr_float t new_val
 and update_float_formula (f: float formula) = update_a_formula eval_expr_float f
 
-(* Construct a formula of a single term. *)
-let t (value: 'a): 'a formula =
-{
-  parents = [];
-  pred_parents = [];
-  on_change = [];
+(* Create a formula helper. *)
+let formula_create (e: 'a expr) (value: 'a) =
+{ 
+  parents = []; 
   value = value;
-  expression = Num (ref value);
-  needs_update = false;
-  }
+  on_change = [];
+  needs_update = false; 
+  expression = e;
+  pred_parents = [];
+}
+
+
+(* Construct a formula of a single term. *)
+let t (value: 'a): 'a formula = formula_create (Num (ref value)) value
 
 (* Shorthand for update methods. *)
 let (=:) = update_int_term
@@ -196,17 +200,6 @@ let (!!) (eq: equation) = eq.value
 let (&) (s: system) = s.value
 
 (* Arithmetic functions. *)
-
-(* Similar to the [t] function above, but needed for creating compound formulas (of multiple terms and binary ops. *)
-let formula_create (e: 'a expr) (value: 'a) =
-{ 
-  parents = []; 
-  value = value;
-  on_change = [];
-  needs_update = false; 
-  expression = e;
-  pred_parents = [];
-}
 
 (* Create a binary operation that merges two formula into a more complex one. *)
 let bin_form_a (op: 'a -> 'a -> 'a) (mk_expr: 'a expr -> 'a expr -> 'a expr) (f1: 'a formula) (f2: 'a formula): 'a formula =
