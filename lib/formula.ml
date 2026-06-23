@@ -247,7 +247,9 @@ let equation_create (e: equation_expr) (value: bool): equation =
 }
 
 (* Equality of new types. *)
-let comp_form_a (comp: 'a -> 'a -> bool) (mk_cmp : 'a formula -> 'a formula -> equation_expr) (f1: 'a formula) (f2: 'a formula): equation =
+let comp_form_a (comp: 'a -> 'a -> bool) 
+                (mk_cmp : 'a formula -> 'a formula -> equation_expr)
+                (f1: 'a formula) (f2: 'a formula): equation =
   let eq = equation_create (mk_cmp f1 f2) (comp f1.value f2.value) in
   f1.pred_parents <- eq :: f1.pred_parents;
   f2.pred_parents <- eq :: f2.pred_parents;
