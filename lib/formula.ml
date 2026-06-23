@@ -12,7 +12,7 @@ type 'a expr =
 and 'a formula =
 {
   mutable parents: 'a formula list;
-  mutable pred_parents: equation list;
+  mutable pred_parents: system list;
   mutable on_change: (unit -> unit) list;
   mutable value: 'a;
   expression: 'a expr;
@@ -26,24 +26,9 @@ and equation_expr =
 | NeFloat of float formula * float formula
 (* Similar to 'a expr and equation_expr but for systems of equations. *)
 and system_expr =
-| AndEq of equation * equation
-| OrEq of equation * equation
-| AndSys of system * system
-| OrSys of system * system
-| AndSE of system * equation
-| OrSE of system * equation
-| AndES of equation * system
-| OrES of equation * system
-(* A wrapper around equation_expr to allow for updating. *)
-and equation =
-{
-  mutable parents: system list;
-  mutable when_satisfied: (unit -> unit) list;
-  mutable on_change: (unit -> unit) list;
-  mutable value: bool;
-  expression: equation_expr;
-  mutable needs_update: bool;
-}
+| Single of equation_expr
+| And of system * system
+| Or of system * system
 (* A wrapper around system_expr to allow for updating. *)
 and system =
 {
@@ -75,41 +60,33 @@ let rec eval_expr_float (e: float expr): float =
 
 (* Evaluate a type *but* avoid unneeded updates with caching *)
 let eval_type (eval: 'a expr -> 'a) (f: 'a formula): 'a = if f.needs_update then eval f.expression else f.value
+let eval_equation (eval: system_expr -> 'a) (eq: system): bool = if eq.needs_update then eval eq.expression else eq.value
 
 (* Specialization of the above "smart" evaluation. *)
 let eval_int (f: int formula): int = eval_type eval_expr_int f
 let eval_float (f: float formula): float = eval_type eval_expr_float f
 
-let eval_equation (eq: equation): bool = match eq.expression with
-| EqInt (a, b) -> (eval_int a) = (eval_int b)
-| EqFloat (a, b) -> (eval_float a) = (eval_float b)
-| NeInt (a, b) -> (eval_int a) <> (eval_int b)
-| NeFloat (a, b) -> (eval_float a) <> (eval_float b)
+let rec eval_expr_equation (e: equation_expr): bool =
+  match e with
+    | EqInt (a, b) -> (eval_int a) = (eval_int b)
+    | EqFloat (a, b) -> (eval_float a) = (eval_float b)
+    | NeInt (a, b) -> (eval_int a) <> (eval_int b)
+    | NeFloat (a, b) -> (eval_float a) <> (eval_float b)
+
 let rec eval_system (s: system): bool = match s.expression with
-| AndEq (a, b) -> (eval_equation a) && (eval_equation b)
-| OrEq (a, b) -> (eval_equation a) || (eval_equation b)
-| AndSys (a, b) -> (eval_system a) && (eval_system b)
-| OrSys (a, b) -> (eval_system a) || (eval_system b)
-| AndSE (a, b) -> (eval_system a) && (eval_equation b)
-| OrSE (a, b) -> (eval_system a) || (eval_equation b)
-| AndES (a, b) -> (eval_equation a) && (eval_system b)
-| OrES (a, b) -> (eval_equation a) || (eval_system b)
+| Single a -> eval_expr_equation a
+| And (a, b) -> (eval_system a) && (eval_system b)
+| Or (a, b) -> (eval_system a) || (eval_system b)
 
 let set_formula_needs_update (f: 'a formula) = f.needs_update <- true
-let set_equation_needs_update (eq: equation) = eq.needs_update <- true
 let set_system_needs_update (s: system) = s.needs_update <- true
 
 let rec propegate (eval: 'a expr -> 'a) (f: 'a formula): unit =
   List.iter (fun g -> g ()) f.on_change;
   List.iter set_formula_needs_update f.parents;
-  List.iter set_equation_needs_update f.pred_parents;
+  List.iter set_system_needs_update f.pred_parents;
   List.iter (update_a_formula eval) f.parents;
-  List.iter update_equation f.pred_parents
-and propegate_equation (eq: equation): unit =
-  List.iter (fun g -> g ()) eq.on_change;
-  if eq.value = true then 
-    (List.iter (fun g -> g ()) eq.when_satisfied;
-    List.iter set_system_needs_update eq.parents) else ()
+  List.iter update_system f.pred_parents
 and propegate_system (eq: system): unit =
   List.iter (fun g -> g ()) eq.on_change;
   if eq.value = true then 
@@ -128,44 +105,15 @@ and update_a_formula (eval: 'a expr -> 'a) (f: 'a formula) =
   if f.value <> new_val then
     (f.value <- new_val;
      propegate eval f)
-and update_equation (eq: equation): unit =
-  match eq.expression with
-  | EqInt (a, b) -> let new_val = (eval_int a) = (eval_int b) in
-    if new_val <> eq.value then
-      (eq.value <- new_val; propegate_equation eq)
-  | EqFloat (a, b) -> let new_val = (eval_float a) = (eval_float b) in
-    if new_val <> eq.value then
-      (eq.value <- new_val; propegate_equation eq)
-  | NeInt (a, b) -> let new_val = (eval_int a) <> (eval_int b) in
-    if new_val <> eq.value then
-      (eq.value <- new_val; propegate_equation eq)
-  | NeFloat (a, b) -> let new_val = (eval_float a) <> (eval_float b) in
-    if new_val <> eq.value then
-      (eq.value <- new_val; propegate_equation eq)
 and update_system (s: system): unit =
   match s.expression with
-  | AndEq (a, b) -> let new_val = (eval_equation a) && (eval_equation b) in
+  | Single a -> let new_val = eval_expr_equation a in
     if new_val <> s.value then
       (s.value <- new_val; propegate_system s)
-  | OrEq (a, b) -> let new_val = (eval_equation a) || (eval_equation b) in
+  | And (a, b) -> let new_val = (eval_system a) && (eval_system b) in
     if new_val <> s.value then
       (s.value <- new_val; propegate_system s)
-  | AndSys (a, b) -> let new_val = (eval_system a) && (eval_system b) in
-    if new_val <> s.value then
-      (s.value <- new_val; propegate_system s)
-  | OrSys (a, b) -> let new_val = (eval_system a) || (eval_system b) in
-    if new_val <> s.value then
-      (s.value <- new_val; propegate_system s)
-  | AndSE (a, b) -> let new_val = (eval_system a) && (eval_equation b) in
-    if new_val <> s.value then
-      (s.value <- new_val; propegate_system s)
-  | OrSE (a, b) -> let new_val = (eval_system a) || (eval_equation b) in
-    if new_val <> s.value then
-      (s.value <- new_val; propegate_system s)
-  | AndES (a, b) -> let new_val = (eval_equation a) && (eval_system b) in
-    if new_val <> s.value then
-      (s.value <- new_val; propegate_system s)
-  | OrES (a, b) -> let new_val = (eval_equation a) || (eval_system b) in
+  | Or (a, b) -> let new_val = (eval_system a) || (eval_system b) in
     if new_val <> s.value then
       (s.value <- new_val; propegate_system s)
 
@@ -196,8 +144,7 @@ let (=:.) = update_float_term
 
 (* Extract values. Basically the same as (!) for reference types. *)
 let (!) (f: 'a formula) = f.value
-let (!!) (eq: equation) = eq.value
-let (&) (s: system) = s.value
+let (!!) (s: system) = s.value
 
 (* Arithmetic functions. *)
 
@@ -242,20 +189,20 @@ let (/.) = div_form_float
 
 (* Comparison operators. *)
 
-let equation_create (e: equation_expr) (value: bool): equation =
+let equation_create (e: equation_expr) (value: bool): system =
 { 
   parents = []; 
   value = value;
   on_change = [];
   needs_update = false; 
-  expression = e; 
+  expression = Single e; 
   when_satisfied = [];
 }
 
-(* Equality of new types. *)
+(* Forming new equations from formula and comparison operators. *)
 let comp_form_a (comp: 'a -> 'a -> bool) 
                 (mk_cmp : 'a formula -> 'a formula -> equation_expr)
-                (f1: 'a formula) (f2: 'a formula): equation =
+                (f1: 'a formula) (f2: 'a formula): system =
   let eq = equation_create (mk_cmp f1 f2) (comp f1.value f2.value) in
   f1.pred_parents <- eq :: f1.pred_parents;
   f2.pred_parents <- eq :: f2.pred_parents;
@@ -277,7 +224,32 @@ let (=.) = eq_form_float
 let ne_form_float = comp_form_a (<>) (fun a b -> NeFloat (a, b))
 let (<>.) = ne_form_float
 
+(* System creation *)
+
+let system_create (e: system_expr) (value: bool): system =
+{ 
+  parents = [];
+  value = value;
+  on_change = [];
+  needs_update = false; 
+  expression = e; 
+  when_satisfied = [];
+}
+
+let sys_make (op: bool -> bool -> bool)
+             (mk_sys: system -> system -> system_expr)
+             (s1: system) (s2: system): system =
+  let sys = system_create (mk_sys s1 s2) (op s1.value s2.value) in
+  s1.parents <- sys :: s1.parents;
+  s2.parents <- sys :: s2.parents;
+  sys
+
+let and_eqs = sys_make (&&) (fun a b -> And (a, b))
+let (&&) = and_eqs
+
+let or_eqs = sys_make (||) (fun a b -> Or (a, b))
+let (||) = or_eqs
 
 (* Listeners *)
 let on_change (f: 'a formula) (g: unit -> unit) = f.on_change <- g :: f.on_change
-let when_satisfied (f: equation) (g: unit -> unit) = f.when_satisfied <- g :: f.when_satisfied
+let when_satisfied (f: system) (g: unit -> unit) = f.when_satisfied <- g :: f.when_satisfied

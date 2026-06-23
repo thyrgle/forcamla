@@ -117,7 +117,7 @@ let test_simple_eq () =
   let y = x =? (t 0) in
   x =: !(x - t 1);
   (check bool) "same bool" true !!y
-
+  
 let test_simple_sat () =
   let x = t 1 in
   let y = x =? (t 0) in

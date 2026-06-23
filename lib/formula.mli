@@ -1,10 +1,7 @@
-(** The fundamental types: [formula]e (combined refs), [equation]s (comparison of formula), and [system]s (collections of equations). *)
+(** The fundamental types: [formula]e (combined refs), and [system]s (collections of equations where each equation is two formula joined by a comparison operator.). *)
 
 (** A combination of terms that represent a mathematical formula *)
 type 'a formula
-
-(** Two formulas with a comparison operator between them. For instance [x + y =? 2] or [2 * x =? 4] *)
-type equation
 
 (** A collecction of equations that are joined by && or ||. *)
 type system
@@ -24,11 +21,8 @@ val (=:.) : float formula -> float -> unit
 (** Get current value of a formula. Similar to (!) for ref types. *)
 val (!) : 'a formula -> 'a
 
-(** Get current value of an equation. Similar to (!) for ref types. *)
-val (!!) : equation -> bool
-
 (** Get current value of a system. Similar to (!) for ref types. *)
-val (&) : system -> bool
+val (!!) : system -> bool
 
 (** Formula creation methods. *)
 
@@ -91,30 +85,30 @@ val (/.) : float formula -> float formula -> float formula
 (** Simple predicate constructors. (Shorthand versions are mentioned below.) *)
 
 (** Create an equation that determines if two int formula are equal. *)
-val eq_form_int : int formula -> int formula -> equation
+val eq_form_int : int formula -> int formula -> system
 
 (** Create an equation that determines if two float formula are equal. *)
-val eq_form_float : float formula -> float formula -> equation
+val eq_form_float : float formula -> float formula -> system
 
 (** Create an equation that determines if two int formula are not equal. *)
-val ne_form_int : int formula -> int formula -> equation
+val ne_form_int : int formula -> int formula -> system
 
 (** Create an equation that determines if two float formula are not equal. *)
-val ne_form_float : float formula -> float formula -> equation
+val ne_form_float : float formula -> float formula -> system
 
 (** Shorthand predicate constructors. *)
 
 (** Shorthand for creating a equation that determines if two int formulas are equal. *)
-val (=?) : int formula -> int formula -> equation
+val (=?) : int formula -> int formula -> system
 
 (** Shorthand for creating a bool formula that determines if two float formulas are equal. *)
-val (=.) : float formula -> float formula -> equation
+val (=.) : float formula -> float formula -> system
 
 (** Shorthand for creating a equation that determines if two int formulas are not equal. *)
-val (<>?) : int formula -> int formula -> equation
+val (<>?) : int formula -> int formula -> system
 
 (** Shorthand for creating a bool formula that determines if two float formulas are not equal. *)
-val (<>.) : float formula -> float formula -> equation
+val (<>.) : float formula -> float formula -> system
 
 (** Event listener constructors *)
 
@@ -122,4 +116,4 @@ val (<>.) : float formula -> float formula -> equation
 val on_change : 'a formula -> (unit -> unit) -> unit
 
 (** Listen and execute when an equation becomes true *)
-val when_satisfied : equation -> (unit -> unit) -> unit
+val when_satisfied : system -> (unit -> unit) -> unit
