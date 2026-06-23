@@ -100,20 +100,16 @@ and update_equation (eq: equation): unit =
   match eq.expression with
   | EqInt (a, b) -> let new_val = (eval_int a) = (eval_int b) in
     if new_val <> eq.value then
-      (eq.value <- new_val;
-       propegate_equation eq)
+      (eq.value <- new_val; propegate_equation eq)
   | EqFloat (a, b) -> let new_val = (eval_float a) = (eval_float b) in
     if new_val <> eq.value then
-      (eq.value <- new_val;
-      propegate_equation eq)
+      (eq.value <- new_val; propegate_equation eq)
   | NeInt (a, b) -> let new_val = (eval_int a) <> (eval_int b) in
     if new_val <> eq.value then
-      (eq.value <- new_val;
-      propegate_equation eq)
+      (eq.value <- new_val; propegate_equation eq)
   | NeFloat (a, b) -> let new_val = (eval_float a) <> (eval_float b) in
     if new_val <> eq.value then
-      (eq.value <- new_val;
-      propegate_equation eq)
+      (eq.value <- new_val; propegate_equation eq)
 and update_system (s: system): unit =
   match s.expression with
   | And (a, b) -> let new_val = (eval_equation a) && (eval_equation b) in
