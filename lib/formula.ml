@@ -187,17 +187,19 @@ let ( *. ) = mul_form_float
 let div_form_float = bin_form_a (/.) (fun a b -> Div (a, b))
 let (/.) = div_form_float
 
-(* Comparison operators. *)
+(* Comparison operators. (Equation creation) *)
 
-let equation_create (e: equation_expr) (value: bool): system =
+let system_create (e: system_expr) (value: bool): system =
 { 
-  parents = []; 
+  parents = [];
   value = value;
   on_change = [];
   needs_update = false; 
-  expression = Single e; 
+  expression = e; 
   when_satisfied = [];
 }
+
+let equation_create (e: equation_expr) (value: bool): system = system_create (Single e) value
 
 (* Forming new equations from formula and comparison operators. *)
 let comp_form_a (comp: 'a -> 'a -> bool) 
@@ -225,16 +227,6 @@ let ne_form_float = comp_form_a (<>) (fun a b -> NeFloat (a, b))
 let (<>.) = ne_form_float
 
 (* System creation *)
-
-let system_create (e: system_expr) (value: bool): system =
-{ 
-  parents = [];
-  value = value;
-  on_change = [];
-  needs_update = false; 
-  expression = e; 
-  when_satisfied = [];
-}
 
 let sys_make (op: bool -> bool -> bool)
              (mk_sys: system -> system -> system_expr)
