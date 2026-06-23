@@ -3,8 +3,7 @@
 (** A combination of terms that represent a mathematical formula *)
 type 'a formula
 
-(** Two formulas with a comparison operator between them. For instance [x + y =? 2] or [2 * x =? 4] 
-    Can also make "equations of equations" like [(x + y =? 2) =? (2 * x = 4)]. *)
+(** Two formulas with a comparison operator between them. For instance [x + y =? 2] or [2 * x =? 4] *)
 type equation
 
 (** A collecction of equations that are joined by && or ||. *)
