@@ -1,8 +1,13 @@
-(** The fundamental types: terms (ref with superpowers!) and formula (combined terms). *)
+(** The fundamental types: [formula]e (combined refs), [equation]s (comparison of formula), and [system]s (collections of equations). *)
 
 (** A combination of terms that represent a mathematical formula *)
 type 'a formula
+
+(** Two formulas with a comparison operator between them. For instance [x + y =? 2] or [2 * x =? 4] 
+    Can also make "equations of equations" like [(x + y =? 2) =? (2 * x = 4)]. *)
 type equation
+
+(** A collecction of equations that are joined by && or ||. *)
 type system
 
 (** Lift basic types to term types. *)
@@ -28,7 +33,7 @@ val (&) : system -> bool
 
 (** Formula creation methods. *)
 
-(** Arithmetic for integer terms. *)
+(** Arithmetic for integer terms. (Shorthand versions are mentioned below.) *)
 
 (** Create a formula that is the sum of two int formula. *)
 val add_form_int : int formula -> int formula -> int formula
@@ -56,7 +61,7 @@ val ( * ) : int formula -> int formula -> int formula
 (** Shorthand for division in an int formula. *)
 val (/) : int formula -> int formula -> int formula
 
-(** Arithmetic for float terms. *)
+(** Arithmetic for float terms. (Shorthand versions are mentioned below.) *)
 
 (** Create a formula that is the sum of two float formula. *)
 val add_form_float : float formula -> float formula -> float formula
@@ -84,7 +89,7 @@ val ( *. ) : float formula -> float formula -> float formula
 (** Shorthand for division in a float formula. *)
 val (/.) : float formula -> float formula -> float formula
 
-(** Simple predicate constructors. *)
+(** Simple predicate constructors. (Shorthand versions are mentioned below.) *)
 
 (** Create an equation that determines if two int formula are equal. *)
 val eq_form_int : int formula -> int formula -> equation
