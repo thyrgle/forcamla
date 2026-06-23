@@ -84,6 +84,10 @@ let () = player.health =:: (player.health - 1) (* Nothing happens yet! player he
 let () = player.health =:: (player.health - 1) (* Now something happens! player.health is 0 and "Game Over!" is printed to the screen! *)
 ]}
 
+{2 A Note On Types}
+
+The type for [player.health =? 0] is not actually a ['a formula]! We have a separate type for equations called [system] (short for "system of equations"). This is just a "system" of 1 equation, but as we will see we can combine equations together with [(&&)] and [(||)] to create actual systems of {i multiple} equations!
+
 {1 API}
 
 {!modules: Formula}
