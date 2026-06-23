@@ -110,6 +110,20 @@ val (<>?) : int formula -> int formula -> system
 (** Shorthand for creating a bool formula that determines if two float formulas are not equal. *)
 val (<>.) : float formula -> float formula -> system
 
+(** Combine equations *)
+
+(** And two equations together *)
+val and_eqs : system -> system -> system
+
+(** Or two equations together *)
+val or_eqs : system -> system -> system
+
+(** Shorthand for anding two equations together. *)
+val (&&) : system -> system -> system
+
+(** Shorthand for oring two equations together. *)
+val (||) : system -> system -> system
+
 (** Event listener constructors *)
 
 (** Listen and execute a function when a formula changes value. *)
