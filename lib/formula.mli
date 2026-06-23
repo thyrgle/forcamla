@@ -97,6 +97,12 @@ val eq_form_int : int formula -> int formula -> equation
 (** Create an equation that determines if two float formula are equal. *)
 val eq_form_float : float formula -> float formula -> equation
 
+(** Create an equation that determines if two int formula are not equal. *)
+val ne_form_int : int formula -> int formula -> equation
+
+(** Create an equation that determines if two float formula are not equal. *)
+val ne_form_float : float formula -> float formula -> equation
+
 (** Shorthand predicate constructors. *)
 
 (** Shorthand for creating a equation that determines if two int formulas are equal. *)
@@ -104,6 +110,12 @@ val (=?) : int formula -> int formula -> equation
 
 (** Shorthand for creating a bool formula that determines if two float formulas are equal. *)
 val (=.) : float formula -> float formula -> equation
+
+(** Shorthand for creating a equation that determines if two int formulas are not equal. *)
+val (<>?) : int formula -> int formula -> equation
+
+(** Shorthand for creating a bool formula that determines if two float formulas are not equal. *)
+val (<>.) : float formula -> float formula -> equation
 
 (** Event listener constructors *)
 
