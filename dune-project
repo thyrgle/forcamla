@@ -20,6 +20,9 @@
  (version 0.1.0)
  (synopsis "Organize program execution via formulae")
  (description "Formulas are either terms or compound statements (terms combined with binary operators). Terms may be updated and then compound statements will reflect the changed updated terms. With this event listeners can be constructed that wait for formulas to be satisfied, changed, etc.")
- (depends (ocaml (>= 5.0.0)))
+ (depends 
+   (ocaml (>= 5.0.0))
+   (alcotest (>= 1.9.1))
+ )
  (tags
   ("mathematical programming" "formula" "event listeners")))
