@@ -72,12 +72,17 @@ let set_formula_needs_update (f: 'a formula) = f.needs_update <- true
 let set_equation_needs_update (eq: equation) = eq.needs_update <- true
 let set_system_needs_update (s: system) = s.needs_update <- true
 
-let rec propegate (eval: 'a expr -> 'a) (f: 'a formula) =
+let rec propegate (eval: 'a expr -> 'a) (f: 'a formula): unit =
   List.iter (fun g -> g ()) f.on_change;
   List.iter set_formula_needs_update f.parents;
   List.iter set_equation_needs_update f.pred_parents;
   List.iter (update_a_formula eval) f.parents;
   List.iter update_equation f.pred_parents
+and propegate_equation (eq: equation): unit =
+  List.iter (fun g -> g ()) eq.on_change;
+  if eq.value = true then 
+    (List.iter (fun g -> g ()) eq.when_satisfied;
+    List.iter set_system_needs_update eq.parents) else ()
 and update_a_term (eval: 'a expr -> 'a) (f: 'a formula) (new_val: 'a) =
   match f.expression with
   | Num t ->
@@ -90,33 +95,25 @@ and update_a_formula (eval: 'a expr -> 'a) (f: 'a formula) =
   let new_val = eval_type eval f in
   if f.value <> new_val then
     (f.value <- new_val;
-     propegate eval f) else ()
+     propegate eval f)
 and update_equation (eq: equation): unit =
   match eq.expression with
   | EqInt (a, b) -> let new_val = (eval_int a) = (eval_int b) in
     if new_val <> eq.value then
       (eq.value <- new_val;
-      List.iter (fun g -> g ()) eq.on_change;
-      (if new_val = true then List.iter (fun g -> g ()) eq.when_satisfied);
-      List.iter set_system_needs_update eq.parents) else ()
+       propegate_equation eq)
   | EqFloat (a, b) -> let new_val = (eval_float a) = (eval_float b) in
     if new_val <> eq.value then
       (eq.value <- new_val;
-      List.iter (fun g -> g ()) eq.on_change;
-      (if new_val = true then List.iter (fun g -> g ()) eq.when_satisfied);
-      List.iter set_system_needs_update eq.parents) else ()
+      propegate_equation eq)
   | NeInt (a, b) -> let new_val = (eval_int a) <> (eval_int b) in
     if new_val <> eq.value then
       (eq.value <- new_val;
-      List.iter (fun g -> g ()) eq.on_change;
-      (if new_val = true then List.iter (fun g -> g ()) eq.when_satisfied);
-      List.iter set_system_needs_update eq.parents) else ()
+      propegate_equation eq)
   | NeFloat (a, b) -> let new_val = (eval_float a) <> (eval_float b) in
     if new_val <> eq.value then
       (eq.value <- new_val;
-      List.iter (fun g -> g ()) eq.on_change;
-      (if new_val = true then List.iter (fun g -> g ()) eq.when_satisfied);
-      List.iter set_system_needs_update eq.parents) else ()
+      propegate_equation eq)
 and update_system (s: system): unit =
   match s.expression with
   | And (a, b) -> let new_val = (eval_equation a) && (eval_equation b) in
