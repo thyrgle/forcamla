@@ -1,15 +1,11 @@
 exception NotATermException of string
 
 type 'a expr =
-  Num of 'a term
+  Num of 'a ref
 | Add of 'a expr * 'a expr
 | Sub of 'a expr * 'a expr
 | Mul of 'a expr * 'a expr
 | Div of 'a expr * 'a expr
-and 'a term =
-{
-  mutable value: 'a;
-}
 and 'a formula =
 {
   mutable parents: 'a formula list;
@@ -52,7 +48,7 @@ let rec eval_expr_int (e: int expr): int =
     | Sub (a, b)     -> (eval_expr_int a) - (eval_expr_int b)
     | Mul (a, b)     -> (eval_expr_int a) * (eval_expr_int b)
     | Div (a, b)     -> (eval_expr_int a) / (eval_expr_int b)
-    | Num x          -> x.value
+    | Num x          -> !x
 
 let rec eval_expr_float (e: float expr): float =
   match e with
@@ -60,7 +56,7 @@ let rec eval_expr_float (e: float expr): float =
     | Sub (a, b) -> (eval_expr_float a) -. (eval_expr_float b)
     | Mul (a, b) -> (eval_expr_float a) *. (eval_expr_float b)
     | Div (a, b) -> (eval_expr_float a) /. (eval_expr_float b)
-    | Num x      -> x.value
+    | Num x      -> !x
  
 let eval_type (eval: 'a expr -> 'a) (f: 'a formula): 'a = if f.needs_update then eval f.expression else f.value
 
@@ -85,8 +81,8 @@ let rec propegate (eval: 'a expr -> 'a) (f: 'a formula) =
 and update_a_term (eval: 'a expr -> 'a) (f: 'a formula) (new_val: 'a) =
   match f.expression with
   | Num t ->
-      if t.value <> new_val then
-     (t.value <- new_val;
+      if !t <> new_val then
+     (t := new_val;
       f.value <- new_val;
       propegate eval f) else ()
   | _ -> raise (NotATermException "Formula is not a term and cannot be reassigned.")
@@ -140,27 +136,24 @@ and update_int_formula (f: int formula) = update_a_formula eval_expr_int f
 let rec update_float_term (t: float formula) (new_val: float): unit = update_a_term eval_expr_float t new_val
 and update_float_formula (f: float formula) = update_a_formula eval_expr_float f
 
-let create_term (value: 'a): 'a term = { value = value; }
-
-let create_formula (t: 'a term): 'a formula =
+let create_formula (t: 'a ref): 'a formula =
 {
   parents = [];
   pred_parents = [];
   on_change = [];
-  value = t.value;
+  value = !t;
   expression = Num t;
   needs_update = false;
 }
 
 let t (value: 'a): 'a formula =
-  let tval = create_term value in
-  {
-    parents = [];
-    pred_parents = [];
-    on_change = [];
-    value = tval.value;
-    expression = Num tval;
-    needs_update = false;
+{
+  parents = [];
+  pred_parents = [];
+  on_change = [];
+  value = value;
+  expression = Num (ref value);
+  needs_update = false;
   }
 
 let (=:) = update_int_term
