@@ -83,10 +83,11 @@ let set_system_needs_update (s: system) = s.needs_update <- true
 
 let rec propegate (eval: 'a expr -> 'a) (f: 'a formula): unit =
   List.iter (fun g -> g ()) f.on_change;
-  List.iter set_formula_needs_update f.parents;
-  List.iter set_system_needs_update f.pred_parents;
+  List.iter (fun p -> p.needs_update <- true) f.parents;
+  List.iter (fun (p: system) -> p.needs_update <- true) f.pred_parents;
   List.iter (update_a_formula eval) f.parents;
-  List.iter update_system f.pred_parents
+  List.iter update_system f.pred_parents;
+  f.needs_update <- false
 and propegate_system (eq: system): unit =
   List.iter (fun g -> g ()) eq.on_change;
   if eq.value = true then 
