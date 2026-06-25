@@ -124,6 +124,16 @@ val (&&) : system -> system -> system
 (** Shorthand for oring two equations together. *)
 val (||) : system -> system -> system
 
+(** Source utilities *)
+
+type source
+
+(** Make a source to listen with. *)
+val make_source : unit -> source
+
+(** Listen with a specified source *)
+val listen : source -> unit
+
 (** Event listener constructors *)
 
 (** Listen and execute a function when a formula changes value. *)
@@ -132,6 +142,8 @@ val on_change : 'a formula -> (unit -> unit) -> unit
 (** Listen and execute a function when a formula changes value. *)
 val system_change : system -> (unit -> unit) -> unit
 
-
 (** Listen and execute when an equation becomes true *)
 val when_satisfied : system -> (unit -> unit) -> unit
+
+(** Source event listener. Execute function if the predicate is true and listen is called. *)
+val exec_while : source -> system -> (unit -> unit) -> unit

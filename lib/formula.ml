@@ -248,6 +248,10 @@ let (&&) = and_eqs
 let or_eqs = sys_make (||) (fun a b -> Or (a, b))
 let (||) = or_eqs
 
+(* Source functions. *)
+
+let make_source () = { sys_func = []; }
+
 let listen (s: source): unit =
   List.iter (fun pair -> if eval_system (fst pair) then (snd pair) () else ()) s.sys_func
 
