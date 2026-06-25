@@ -182,7 +182,7 @@ type 'a source
 val make_int_source : unit -> int source
 
 (** Make a source to listen with (With float formulas) *)
-val make_int_source : unit -> int source
+val make_float_source : unit -> int source
 
 (** Listen with a specified source *)
 val listen : 'a source -> unit
