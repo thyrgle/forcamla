@@ -115,6 +115,20 @@ let () = player.health =:: (player.health + 1) (* Now something happens! player 
 
 Lastly, if you want to check if a [formula] changes value, you can use [on_change] instead of [system_change].
 
+{1 Refine Existing Event Listeners with [source]s}
+
+One can call [listen s] where [s] is of type [source]. When [listen] is called [s] goes through every [system] (internally stored as a list) it contains. Then, with each [system] there is an associated callback function [g : unit -> unit] which is called. Let's see how to do this with an example:
+
+{[
+let x = t 3 (* Create a term. *)
+let g () = print_endline "x <> 0" (* The callback function. *)
+let s = make_source () (* Make an empty source. *)
+let () = exec_while s (x <>? 0) g; (* Reads: Every time we listen to s and x <> 0, execute g. *)
+         listen s; (* Prints "x <> 0" because x = 3 => x <> 0. *)
+	 x =:: 0;
+	 listen s (* Does nothing because x = 0 *)
+]}
+
 
 {1 API}
 
