@@ -40,6 +40,11 @@ and system =
   mutable needs_update: bool;
 }
 
+type source =
+{
+  mutable sys_func : (system * (unit -> unit)) list;
+}
+
 (* Evaluate what an int expr currently should be. *)
 let rec eval_expr_int (e: int expr): int =
   match e with
@@ -243,7 +248,11 @@ let (&&) = and_eqs
 let or_eqs = sys_make (||) (fun a b -> Or (a, b))
 let (||) = or_eqs
 
+let listen (s: source): unit =
+  List.iter (fun pair -> if eval_system (fst pair) then (snd pair) () else ()) s.sys_func
+
 (* Listeners *)
 let on_change (f: 'a formula) (g: unit -> unit) = f.on_change <- g :: f.on_change
 let system_change (f: system) (g: unit -> unit) = f.on_change <- g :: f.on_change
 let when_satisfied (f: system) (g: unit -> unit) = f.when_satisfied <- g :: f.when_satisfied
+let exec_while (src: source) (s: system) (g: unit -> unit) = src.sys_func <- (s, g) :: src.sys_func
