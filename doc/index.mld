@@ -39,7 +39,7 @@ open Formula (* To use formula *)
 let x = t 2 (* Create an integer term called x *)
 let y = t 2 (* Create an integer term called y *)
 let z = x + y
-x =:: 3 (* Set x to 3, and z now is 5 *)
+x =: 3 (* Set x to 3, and z now is 5 *)
 ]}
 
 But it gets even better!
@@ -79,9 +79,9 @@ let () = when_satisfied (player.health =? 0) game_over
 [=?] is used to check if an integer formula is equal to another (integer) formula. The above expression reads as "When [player.health] becomes [0], fire the function [game_over]." If we run:
 
 {[
-let () = player.health =:: (player.health - 1) (* Nothing happens yet! player.health is 2 now. *)
-let () = player.health =:: (player.health - 1) (* Nothing happens yet! player health is 1 now. *)
-let () = player.health =:: (player.health - 1) (* Now something happens! player.health is 0 and "Game Over!" is printed to the screen! *)
+let () = player.health =: (player.health - 1) (* Nothing happens yet! player.health is 2 now. *)
+let () = player.health =: (player.health - 1) (* Nothing happens yet! player health is 1 now. *)
+let () = player.health =: (player.health - 1) (* Now something happens! player.health is 0 and "Game Over!" is printed to the screen! *)
 ]}
 
 Furthermore, [forcamla] supports OCaml comparison operators out of the box. Just append [?] to indicate two [int] formula are being compared such as [x <? y] is read "Is [x] less than [y]?". For floating point formulas, append [.] such as [x >=. y] is read "Is [x] greater than or equal to [y]?".
@@ -96,20 +96,20 @@ The type for [player.health =? 0] is not actually a ['a formula] (more specifica
 Another core event listener is [system_change]. [system_change] causes a supplied function to fire {i whenever} a supplied [system] changes truthiness. This is different than [when_satisfied] which executes {i only} when a [system] becomes [true]. As an example, consider the following sequence of events with [when_satisfied]):
 {[
 let () = when_satisfied (player.health =? 0) game_over
-let () = player.health =:: (player.health - 1) (* Nothing happens yet! player.health is 2 now. *)
-let () = player.health =:: (player.health - 1) (* Nothing happens yet! player health is 1 now. *)
-let () = player.health =:: (player.health - 1) (* Now something happens! player.health is 0 and "Game Over!" is printed to the screen! *)
-let () = player.health =:: (player.health - 1) (* Nothing happens! player health is -1 now. *)
+let () = player.health =: (player.health - 1) (* Nothing happens yet! player.health is 2 now. *)
+let () = player.health =: (player.health - 1) (* Nothing happens yet! player health is 1 now. *)
+let () = player.health =: (player.health - 1) (* Now something happens! player.health is 0 and "Game Over!" is printed to the screen! *)
+let () = player.health =: (player.health - 1) (* Nothing happens! player health is -1 now. *)
 ]}
 
 Now consider we change [when_satisfied] to [system_change]:
 
 {[
 let () = system_change (player.health =? 0) game_over
-let () = player.health =:: (player.health - 1) (* Nothing happens yet! player.health is 2 now. *)
-let () = player.health =:: (player.health - 1) (* Nothing happens yet! player health is 1 now. *)
-let () = player.health =:: (player.health - 1) (* Now something happens! player.health is 0 and "Game Over!" is printed to the screen! *)
-let () = player.health =:: (player.health - 1) (* Something also happens because the player's health is now <> 0 and the system changed from true to false! *)
+let () = player.health =: (player.health - 1) (* Nothing happens yet! player.health is 2 now. *)
+let () = player.health =: (player.health - 1) (* Nothing happens yet! player health is 1 now. *)
+let () = player.health =: (player.health - 1) (* Now something happens! player.health is 0 and "Game Over!" is printed to the screen! *)
+let () = player.health =: (player.health - 1) (* Something also happens because the player's health is now <> 0 and the system changed from true to false! *)
 ]}
 
 [system_change] is a variant of the function [on_change] which operates on [formula].
@@ -126,11 +126,11 @@ let g () = print_endline "x > 0" (* The callback function. *)
 let s = make_source () (* Make an empty source. *)
 let () = exec_while s (x >? 0) g; (* Reads: Every time we listen to s and x <> 0, execute g. *)
          listen s; (* Prints "x <> 0" because x = 3 => x <> 0. *)
-	 x =:: (x - 1); (* x is now 2 *)
+	 x =: (x - 1); (* x is now 2 *)
 	 listen s; (* x is still > 0 so print "x > 0" 0when s listens! *)
-	 x =:: (x - 1); (* x is now 1 *)
+	 x =: (x - 1); (* x is now 1 *)
 	 listen s; (* x is still > 0 so print "x > 0" 0when s listens! *)
-	 x =:: (x - 1);
+	 x =: (x - 1);
 	 listen s (* Nothing happens as x is now = 0. *)
 ]}
 
