@@ -116,6 +116,8 @@ let () = player.health =:: (player.health - 1) (* Something also happens because
 
 {1 Refine Existing Event Listeners with [source]s}
 
+{2 Simple [source] Example}
+
 One can call [listen s] where [s] is of type [source]. When [listen] is called [s] goes through every [system] (internally stored as a list) it contains. Then, with each [system] there is an associated callback function [g : unit -> unit] which is called. Let's see how to do this with an example:
 
 {[
@@ -131,6 +133,8 @@ let () = exec_while s (x >? 0) g; (* Reads: Every time we listen to s and x <> 0
 	 x =:: (x - 1);
 	 listen s (* Nothing happens as x is now = 0. *)
 ]}
+
+{2 The Relation to Event Listeners}
 
 What does this have to do with event listeners? Suppose we have an event listener called [my_event_listener]. Then we may invoke [listen s f] to execute only when the formula is [true]. That is,
 
