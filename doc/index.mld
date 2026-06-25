@@ -127,9 +127,9 @@ let s = make_source () (* Make an empty source. *)
 let () = exec_while s (x >? 0) g; (* Reads: Every time we listen to s and x <> 0, execute g. *)
          listen s; (* Prints "x <> 0" because x = 3 => x <> 0. *)
 	 x =: !(x - t 1); (* x is now 2 *)
-	 listen s; (* x is still > 0 so print "x > 0" 0when s listens! *)
+	 listen s; (* x is still > 0 so print "x > 0" 0 when s listens! *)
 	 x =: !(x - t 1); (* x is now 1 *)
-	 listen s; (* x is still > 0 so print "x > 0" 0when s listens! *)
+	 listen s; (* x is still > 0 so print "x > 0" 0 when s listens! *)
 	 x =: !(x - t 1);
 	 listen s (* Nothing happens as x is now = 0. *)
 ]}
