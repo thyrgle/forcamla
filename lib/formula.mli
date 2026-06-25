@@ -4,7 +4,7 @@
 type 'a formula
 
 (** A collecction of equations that are joined by && or ||. *)
-type system
+type 'a system
 
 (** Lift basic types to term types. *)
 val t : 'a -> 'a formula
@@ -12,9 +12,7 @@ val t : 'a -> 'a formula
 (** Update term methods. *)
 
 (** Update an int term to a new value. *)
-val (=:) : int formula -> int -> unit
-(** Update a float term to a new value. *)
-val (=:.) : float formula -> float -> unit
+val (=:) : 'a formula -> 'a -> unit
 
 (** Extraction of the (current) value for a term or formula. *)
 
@@ -22,7 +20,7 @@ val (=:.) : float formula -> float -> unit
 val (!) : 'a formula -> 'a
 
 (** Get current value of a system. Similar to (!) for ref types. *)
-val (!!) : system -> bool
+val (!!) : 'a system -> bool
 
 (** Formula creation methods. *)
 
@@ -85,54 +83,57 @@ val (/.) : float formula -> float formula -> float formula
 (** Simple predicate constructors. (Shorthand versions are mentioned below.) *)
 
 (** Create an equation that determines if two int formula are equal. *)
-val eq_form_int : int formula -> int formula -> system
+val eq_form_int : int formula -> int formula -> int system
 
 (** Create an equation that determines if two float formula are equal. *)
-val eq_form_float : float formula -> float formula -> system
+val eq_form_float : float formula -> float formula -> float system
 
 (** Create an equation that determines if two int formula are not equal. *)
-val ne_form_int : int formula -> int formula -> system
+val ne_form_int : int formula -> int formula -> int system
 
 (** Create an equation that determines if two float formula are not equal. *)
-val ne_form_float : float formula -> float formula -> system
+val ne_form_float : float formula -> float formula -> float system
 
 (** Shorthand predicate constructors. *)
 
 (** Shorthand for creating a equation that determines if two int formulas are equal. *)
-val (=?) : int formula -> int formula -> system
+val (=?) : int formula -> int formula -> int system
 
 (** Shorthand for creating a bool formula that determines if two float formulas are equal. *)
-val (=.) : float formula -> float formula -> system
+val (=.) : float formula -> float formula -> float system
 
 (** Shorthand for creating a equation that determines if two int formulas are not equal. *)
-val (<>?) : int formula -> int formula -> system
+val (<>?) : int formula -> int formula -> int system
 
 (** Shorthand for creating a bool formula that determines if two float formulas are not equal. *)
-val (<>.) : float formula -> float formula -> system
+val (<>.) : float formula -> float formula -> float system
 
 (** Combine equations *)
 
 (** And two equations together *)
-val and_eqs : system -> system -> system
+val and_eqs : 'a system -> 'a system -> 'a system
 
 (** Or two equations together *)
-val or_eqs : system -> system -> system
+val or_eqs : 'a system -> 'a system -> 'a system
 
 (** Shorthand for anding two equations together. *)
-val (&&) : system -> system -> system
+val (&&) : 'a system -> 'a system -> 'a system
 
 (** Shorthand for oring two equations together. *)
-val (||) : system -> system -> system
+val (||) : 'a system -> 'a system -> 'a system
 
 (** Source utilities *)
 
-type source
+type 'a source
 
-(** Make a source to listen with. *)
-val make_source : unit -> source
+(** Make a source to listen with. (With int formulas) *)
+val make_int_source : unit -> int source
+
+(** Make a source to listen with (With float formulas) *)
+val make_int_source : unit -> int source
 
 (** Listen with a specified source *)
-val listen : source -> unit
+val listen : 'a source -> unit
 
 (** Event listener constructors *)
 
@@ -140,10 +141,10 @@ val listen : source -> unit
 val on_change : 'a formula -> (unit -> unit) -> unit
 
 (** Listen and execute a function when a formula changes value. *)
-val system_change : system -> (unit -> unit) -> unit
+val system_change : 'a system -> (unit -> unit) -> unit
 
 (** Listen and execute when an equation becomes true *)
-val when_satisfied : system -> (unit -> unit) -> unit
+val when_satisfied : 'a system -> (unit -> unit) -> unit
 
 (** Source event listener. Execute function if the predicate is true and listen is called. *)
-val exec_while : source -> system -> (unit -> unit) -> unit
+val exec_while : 'a source -> 'a system -> (unit -> unit) -> unit

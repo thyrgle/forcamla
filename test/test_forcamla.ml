@@ -26,7 +26,7 @@ let test_update_term () =
 
 let test_update_term_float () =
   let x = t 1.0 in
-  x =:. 3.0;
+  x =: 3.0;
   (check (float 0.01)) "same int" 3.0 !x
 
 let test_update_form () =
@@ -38,7 +38,7 @@ let test_update_form () =
 let test_update_form_float () =
   let x = t 1.0 in
   let y = x +. (t 1.0) in
-  x =:. 3.0;
+  x =: 3.0;
   (check (float 0.01)) "same int" 4.0 !y
 
 let test_complex_expr () = 
@@ -72,7 +72,7 @@ let test_complex_update () =
 let test_complex_update_float () = 
   let x = t 3.0 in
   let z = x *. x in
-  x =:. 2.0;
+  x =: 2.0;
   (check (float 0.01)) "same int" 4.0 !z
 
 let test_term_form_expr () = 
@@ -86,7 +86,7 @@ let test_term_form_expr_float () =
   let x = t 3.0 in
   let y = x +. (t 1.0) in
   let w = x *. y in
-  x =:. 2.0;
+  x =: 2.0;
   (check (float 0.01)) "same int" 6.0 !w
 
 let test_simple_inc () =
