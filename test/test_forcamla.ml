@@ -148,6 +148,28 @@ let test_simple_sat () =
   (check int) "same int" 2 z.contents
 
 
+let test_player_health_go () =
+  let x = ref "In Play" in
+  let g () = x := "Game Over" in
+  let open Formula in
+  let health = t 3 in
+  when_satisfied (health =? t 0) g;
+  health =: !(health - t 1);
+  health =: !(health - t 1);
+  health =: !(health - t 1);
+  (check string) "same string" "Game Over" x.contents
+
+let test_player_health_ip () =
+  let x = ref "In Play" in
+  let g () = x := "Game Over" in
+  let open Formula in
+  let health = t 3 in
+  when_satisfied (health =? t 0) g;
+  health =: !(health - t 1);
+  health =: !(health - t 1);
+  (check string) "same string" "In Play" x.contents
+
+
 let () =
   run "Utils" [
       "simple", [
@@ -176,5 +198,7 @@ let () =
       ];
       "event-listeners", [
         test_case "Simple when_satisfied" `Quick test_simple_sat;
+        test_case "Player health test (Game Over)" `Quick test_player_health_go;
+        test_case "Player health test (In Play)" `Quick test_player_health_ip;
       ];
   ]
