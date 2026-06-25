@@ -1,81 +1,95 @@
 open Alcotest
-open Formula
 
 let test_term_extract () =
+  let open Formula in
   let x = t 1 in
   (check int) "same int" 1 !x
 
 let test_term_extract_float () =
+  let open Formula in
   let x = t 1.0 in
   (check (float 0.01)) "same float" 1.0 !x
 
 let test_form_extract () =
+  let open Formula in
   let x = t 1 in
   let y = x + (t 1) in
   (check int) "same int" 2 !y
 
 let test_form_extract_float () =
+  let open Formula in
   let x = t 1.0 in
   let y = x +. (t 1.0) in
   (check (float 0.01)) "same int" 2.0 !y
 
 let test_update_term () =
+  let open Formula in
   let x = t 1 in
   x =: 3;
   (check int) "same int" 3 !x
 
 let test_update_term_float () =
+  let open Formula in
   let x = t 1.0 in
   x =: 3.0;
   (check (float 0.01)) "same int" 3.0 !x
 
 let test_update_form () =
+  let open Formula in
   let x = t 1 in
   let y = x + (t 1) in
   x =: 3;
   (check int) "same int" 4 !y
 
 let test_update_form_float () =
+  let open Formula in
   let x = t 1.0 in
   let y = x +. (t 1.0) in
   x =: 3.0;
   (check (float 0.01)) "same int" 4.0 !y
 
-let test_complex_expr () = 
+let test_complex_expr () =
+  let open Formula in
   let x = t 3 in
   let z = x * x in
   (check int) "same int" 9 !z
 
 let test_complex_expr_float () = 
+  let open Formula in
   let x = t 3.0 in
   let z = x *. x in
   (check (float 0.01)) "same int" 9.0 !z
 
 let test_term_form_expr () = 
+  let open Formula in
   let x = t 3 in
   let y = x + (t 1) in
   let w = x * y in
   (check int) "same int" 12 !w
 
 let test_term_form_expr_float () = 
+  let open Formula in
   let x = t 3.0 in
   let y = x +. (t 1.0) in
   let w = x *. y in
   (check (float 0.01)) "same int" 12.0 !w
 
 let test_complex_update () = 
+  let open Formula in
   let x = t 3 in
   let z = x * x in
   x =: 2;
   (check int) "same int" 4 !z
 
 let test_complex_update_float () = 
+  let open Formula in
   let x = t 3.0 in
   let z = x *. x in
   x =: 2.0;
   (check (float 0.01)) "same int" 4.0 !z
 
 let test_term_form_expr () = 
+  let open Formula in
   let x = t 3 in
   let y = x + (t 1) in
   let w = x * y in
@@ -83,6 +97,7 @@ let test_term_form_expr () =
   (check int) "same int" 6 !w
 
 let test_term_form_expr_float () = 
+  let open Formula in
   let x = t 3.0 in
   let y = x +. (t 1.0) in
   let w = x *. y in
@@ -90,17 +105,20 @@ let test_term_form_expr_float () =
   (check (float 0.01)) "same int" 6.0 !w
 
 let test_simple_inc () =
+  let open Formula in
   let x = t 2 in
   x =: !(x + t 1);
   (check int) "same int" 3 !x
 
 let test_complex_update () =
+  let open Formula in
   let x = t 2 in
   let z = x * x in
   x =: !(x + t 1); 
   (check int) "same int" 9 !z
 
 let test_term_form_update () =
+  let open Formula in
   let x = t 2 in
   let y = x + (t 1) in
   let w = x * y in
@@ -108,17 +126,20 @@ let test_term_form_update () =
   (check int) "same int" 12 !w
 
 let test_simple_eq_no_change () =
+  let open Formula in
   let x = t 1 in
   let y = x =? (t 0) in
   (check bool) "same bool" false !!y
 
 let test_simple_eq () =
+  let open Formula in
   let x = t 1 in
   let y = x =? (t 0) in
   x =: !(x - t 1);
   (check bool) "same bool" true !!y
   
 let test_simple_sat () =
+  let open Formula in
   let x = t 1 in
   let y = x =? (t 0) in
   let z = ref 1 in
