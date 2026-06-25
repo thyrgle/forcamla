@@ -65,9 +65,9 @@ let () = when_satisfied (player.health =? 0) game_over
 `=?` is used to check if an integer formula is equal to another (integer) formula. This reads as: "When `player.health` is `0` fire the function `game_over`". Therfore, if we run:
 
 ```ocaml
-let () = player.health =: !(player.health - 1) (* Nothing happens yet! player.health is 2 now. *)
-let () = player.health =: !(player.health - 1) (* Nothing happens yet! player health is 1 now. *)
-let () = player.health =: !(player.health - 1) (* Now something happens! player.health is 0 and "Game Over!" is printed to the screen! *)
+let () = player.health =: !(player.health - t 1) (* Nothing happens yet! player.health is 2 now. *)
+let () = player.health =: !(player.health - t 1) (* Nothing happens yet! player health is 1 now. *)
+let () = player.health =: !(player.health - t 1) (* Now something happens! player.health is 0 and "Game Over!" is printed to the screen! *)
 ```
 
 ## Documentation
