@@ -132,6 +132,18 @@ let () = exec_while s (x >? 0) g; (* Reads: Every time we listen to s and x <> 0
 	 listen s (* Nothing happens as x is now = 0. *)
 ]}
 
+What does this have to do with event listeners? Suppose we have an event listener called [my_event_listener]. Then we may invoke [listen s f] to execute only when the formula is [true]. That is,
+
+{[
+...
+let () = exec_while s f
+...
+let my_event_listener event =
+  ...
+  listen s;
+  ...
+]}
+
 {1 API}
 
 {!modules: Formula}
