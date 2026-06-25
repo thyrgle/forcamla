@@ -108,6 +108,58 @@ val (<>?) : int formula -> int formula -> int system
 (** Shorthand for creating a bool formula that determines if two float formulas are not equal. *)
 val (<>.) : float formula -> float formula -> float system
 
+(** Create an equation that determines if two int formula are equal. *)
+val gt_form_int : int formula -> int formula -> int system
+
+(** Create an equation that determines if two float formula are equal. *)
+val gt_form_float : float formula -> float formula -> float system
+
+(** Create an equation that determines if two int formula are not equal. *)
+val gte_form_int : int formula -> int formula -> int system
+
+(** Create an equation that determines if two float formula are not equal. *)
+val gte_form_float : float formula -> float formula -> float system
+
+(** Shorthand predicate constructors. *)
+
+(** Shorthand for creating a equation that determines if for two int formulas LHS > RHS. *)
+val (>?) : int formula -> int formula -> int system
+
+(** Shorthand for creating a bool formula that determines if two float formulas LHS > RHS. *)
+val (>.) : float formula -> float formula -> float system
+
+(** Shorthand for creating a equation that determines if for two int formulas LHS >= RHS. *)
+val (>=?) : int formula -> int formula -> int system
+
+(** Shorthand for creating a bool formula that determines if for two float formulas LHS >= RHS. *)
+val (>=.) : float formula -> float formula -> float system
+
+(** Create an equation that determines if two int formula are equal. *)
+val lt_form_int : int formula -> int formula -> int system
+
+(** Create an equation that determines if two float formula are equal. *)
+val lt_form_float : float formula -> float formula -> float system
+
+(** Create an equation that determines if two int formula are not equal. *)
+val lte_form_int : int formula -> int formula -> int system
+
+(** Create an equation that determines if two float formula are not equal. *)
+val lte_form_float : float formula -> float formula -> float system
+
+(** Shorthand predicate constructors. *)
+
+(** Shorthand for creating a equation that determines if for two int formulas LHS < RHS. *)
+val (<?) : int formula -> int formula -> int system
+
+(** Shorthand for creating a bool formula that determines if two float formulas LHS < RHS. *)
+val (<.) : float formula -> float formula -> float system
+
+(** Shorthand for creating a equation that determines if for two int formulas LHS <= RHS. *)
+val (<=?) : int formula -> int formula -> int system
+
+(** Shorthand for creating a bool formula that determines if for two float formulas LHS <= RHS. *)
+val (<=.) : float formula -> float formula -> float system
+
 (** Combine equations *)
 
 (** And two equations together *)

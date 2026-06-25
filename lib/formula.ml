@@ -203,6 +203,38 @@ let (=.) = eq_form_float
 let ne_form_float = comp_form_a (<>) (fun a b -> Comp (a.expression, b.expression, (<>)))
 let (<>.) = ne_form_float
 
+(* Greater than of two int formulas. *)
+let gt_form_int = comp_form_a (>) (fun a b -> Comp (a.expression, b.expression, (>)))
+let (>?) = gt_form_int
+
+(* Greater than or equals of two int formulas. *)
+let gte_form_int = comp_form_a (>=) (fun a b -> Comp (a.expression, b.expression, (>=)))
+let (>=?) = gte_form_int
+
+(* Greater than of two float formulas. *)
+let gt_form_float = comp_form_a (>) (fun a b -> Comp (a.expression, b.expression, (>)))
+let (>.) = gt_form_float
+
+(* Greater than or equals of two float formulas. *)
+let gte_form_float = comp_form_a (>=) (fun a b -> Comp (a.expression, b.expression, (>=)))
+let (>=.) = gte_form_float
+
+(* Less than of two int formulas. *)
+let lt_form_int = comp_form_a (>) (fun a b -> Comp (a.expression, b.expression, (<)))
+let (<?) = lt_form_int
+
+(* Less than or equals of two int formulas. *)
+let lte_form_int = comp_form_a (>=) (fun a b -> Comp (a.expression, b.expression, (<=)))
+let (<=?) = lte_form_int
+
+(* Less than of two float formulas. *)
+let lt_form_float = comp_form_a (>) (fun a b -> Comp (a.expression, b.expression, (<)))
+let (<.) = lt_form_float
+
+(* Less than or equals of two float formulas. *)
+let lte_form_float = comp_form_a (>=) (fun a b -> Comp (a.expression, b.expression, (<=)))
+let (<=.) = lte_form_float
+
 (* System creation *)
 
 let sys_make (op: bool -> bool -> bool)
