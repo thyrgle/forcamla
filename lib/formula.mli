@@ -129,5 +129,9 @@ val (||) : system -> system -> system
 (** Listen and execute a function when a formula changes value. *)
 val on_change : 'a formula -> (unit -> unit) -> unit
 
+(** Listen and execute a function when a formula changes value. *)
+val system_change : system -> (unit -> unit) -> unit
+
+
 (** Listen and execute when an equation becomes true *)
 val when_satisfied : system -> (unit -> unit) -> unit

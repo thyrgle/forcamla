@@ -245,4 +245,5 @@ let (||) = or_eqs
 
 (* Listeners *)
 let on_change (f: 'a formula) (g: unit -> unit) = f.on_change <- g :: f.on_change
+let system_change (f: system) (g: unit -> unit) = f.on_change <- g :: f.on_change
 let when_satisfied (f: system) (g: unit -> unit) = f.when_satisfied <- g :: f.when_satisfied
