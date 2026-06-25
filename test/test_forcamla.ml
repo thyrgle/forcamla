@@ -169,6 +169,26 @@ let test_player_health_ip () =
   health =: !(health - t 1);
   (check string) "same string" "In Play" x.contents
 
+let test_source_simple () =
+  let x = ref 0 in
+  let g () = x := (!x + 1) in
+  let open Formula in
+  let s = make_int_source () in
+  let y = t 0 in
+  let test = (y >=? t 3) in
+  exec_while s test g;
+  listen s;
+  y =: !(y + t 1);
+  listen s;
+  y =: !(y + t 1);
+  listen s;
+  y =: !(y + t 1);
+  listen s;
+  y =: !(y + t 1);
+  listen s;
+  (check int) "same int" 2 x.contents
+
+
 
 let () =
   run "Utils" [
@@ -200,5 +220,8 @@ let () =
         test_case "Simple when_satisfied" `Quick test_simple_sat;
         test_case "Player health test (Game Over)" `Quick test_player_health_go;
         test_case "Player health test (In Play)" `Quick test_player_health_ip;
+      ];
+      "sources", [
+        test_case "Simple source test." `Quick test_source_simple;
       ];
   ]
