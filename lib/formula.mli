@@ -220,7 +220,7 @@ val on_change : 'a formula -> (unit -> unit) -> unit
 (** Listen and execute a function when a [system] changes value. *)
 val system_change : 'a system -> (unit -> unit) -> unit
 
-(** Listen and execute when a [system] becomes true *)
+(** Listen and execute when a [system] becomes true. *)
 val when_satisfied : 'a system -> (unit -> unit) -> unit
 
 (** Source event listener. Suppose [s] has registered a system [eq].
