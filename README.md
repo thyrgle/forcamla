@@ -39,7 +39,10 @@ But it gets even better!
 
 Suppose you're making a game. You probably have `player` and maybe it has type `hero` with a bunch of fields including health.
 ```ocaml
-open Formula
+let t = Formula.t
+let (=:) = Formula.(=:)
+let (=?) = Formula.(=?)
+let (!) = Formula.(!)
 
 type hero =
 {
