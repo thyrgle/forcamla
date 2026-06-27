@@ -1,30 +1,41 @@
-(** The fundamental types: [formula]e (combined refs), and [system]s (collections of equations where each equation is two formula joined by a comparison operator.). *)
+(** Create mathematical formula, equations, and systems of equations as well as define event listeners that check for various changes in these mathematical objects. *)
 
-(** A combination of terms that represent a mathematical formula *)
+(** {1 The Fundamental Types} *)
+
+(** A combination of terms (similar to variables) and operations that represent a mathematical formula *)
 type 'a formula
 
-(** A collecction of equations that are joined by && or ||. *)
+(** A collecction of equations (possibly a collection of one equation). {b Note:} For type safety reasons, [system] type is distinct from the [formula] type. *)
 type 'a system
+
+(** {1 Term Creation} *)
+
+(** Terms are of type [formula]. In particular, a {i term} refers to a [formula] with no binary operations.
+    There is no term type, but the distinction is made because {i only} terms can be assigned values 
+    (otherwise a [NotATermException] error is thrown!).
+*)
 
 (** Lift basic types to term types. *)
 val t : 'a -> 'a formula
 
-(** Update term methods. *)
+(** {1 Update Term Methods} *)
 
-(** Update an int term to a new value. *)
+(** Update an int term to a new value. (If the supplied formula is {i not} a term, an error is thrown.) *)
 val (=:) : 'a formula -> 'a -> unit
 
-(** Extraction of the (current) value for a term or formula. *)
+(** {1 Extraction: Get the (current) value for a [formula] or [system]} *)
 
-(** Get current value of a formula. Similar to (!) for ref types. *)
+(** Get current value of a formula. Similar to [(!)] for ref types. *)
 val (!) : 'a formula -> 'a
 
-(** Get current value of a system. Similar to (!) for ref types. *)
+(** Get current value of a system. Similar to [(!)] for ref types. *)
 val (!!) : 'a system -> bool
 
-(** Formula creation methods. *)
+(** {1 Formula creation methods} *)
 
-(** Arithmetic for integer terms. (Shorthand versions are mentioned below.) *)
+(** {2 Arithmetic for [int formula]} *)
+
+(** Shorthand versions are presented in the next section! *)
 
 (** Create a formula that is the sum of two int formula. *)
 val add_form_int : int formula -> int formula -> int formula
@@ -38,7 +49,7 @@ val mul_form_int : int formula -> int formula -> int formula
 (** Create a formula that is the quotient of two int formula *)
 val div_form_int : int formula -> int formula -> int formula
 
-(** Shorthand arithmetic for terms. *)
+(** {2 Shorthand arithmetic for [int formula]} *)
 
 (** Shorthand for addition in an int formula. *)
 val (+) : int formula -> int formula -> int formula
@@ -52,7 +63,9 @@ val ( * ) : int formula -> int formula -> int formula
 (** Shorthand for division in an int formula. *)
 val (/) : int formula -> int formula -> int formula
 
-(** Arithmetic for float terms. (Shorthand versions are mentioned below.) *)
+(** {2 Arithmetic for [float formula]} *)
+
+(** Shorthand versions are presented in the next section! *)
 
 (** Create a formula that is the sum of two float formula. *)
 val add_form_float : float formula -> float formula -> float formula
@@ -66,7 +79,7 @@ val mul_form_float : float formula -> float formula -> float formula
 (** Create a formula that is the quotient of two float formula. *)
 val div_form_float : float formula -> float formula -> float formula
 
-(** Shorthand floating point arithmetic for terms. *)
+(** {2 Shorthand [float formula] arithmetic} *)
 
 (** Shorthand for addition in a float formula. *)
 val (+.) : float formula -> float formula -> float formula
@@ -80,7 +93,15 @@ val ( *. ) : float formula -> float formula -> float formula
 (** Shorthand for division in a float formula. *)
 val (/.) : float formula -> float formula -> float formula
 
-(** Simple predicate constructors. (Shorthand versions are mentioned below.) *)
+(** {1 [system] Constructors} *)
+
+(** {2 Fundamental [system] Constructors} *)
+
+(** Fundamental [system] types have only one equation.
+    Given two formula [f1] and [f2], fundamental system are of the form [f1 comp f2] where [comp] is a 
+    method of {i comparing} the two formula.
+    Shorthand versions are mentioned below.
+*)
 
 (** Create an equation that determines if two int formula are equal. *)
 val eq_form_int : int formula -> int formula -> int system
@@ -94,20 +115,6 @@ val ne_form_int : int formula -> int formula -> int system
 (** Create an equation that determines if two float formula are not equal. *)
 val ne_form_float : float formula -> float formula -> float system
 
-(** Shorthand predicate constructors. *)
-
-(** Shorthand for creating a equation that determines if two int formulas are equal. *)
-val (=?) : int formula -> int formula -> int system
-
-(** Shorthand for creating a bool formula that determines if two float formulas are equal. *)
-val (=.) : float formula -> float formula -> float system
-
-(** Shorthand for creating a equation that determines if two int formulas are not equal. *)
-val (<>?) : int formula -> int formula -> int system
-
-(** Shorthand for creating a bool formula that determines if two float formulas are not equal. *)
-val (<>.) : float formula -> float formula -> float system
-
 (** Create an equation that determines if two int formula are equal. *)
 val gt_form_int : int formula -> int formula -> int system
 
@@ -119,20 +126,6 @@ val gte_form_int : int formula -> int formula -> int system
 
 (** Create an equation that determines if two float formula are not equal. *)
 val gte_form_float : float formula -> float formula -> float system
-
-(** Shorthand predicate constructors. *)
-
-(** Shorthand for creating a equation that determines if for two int formulas LHS > RHS. *)
-val (>?) : int formula -> int formula -> int system
-
-(** Shorthand for creating a bool formula that determines if two float formulas LHS > RHS. *)
-val (>.) : float formula -> float formula -> float system
-
-(** Shorthand for creating a equation that determines if for two int formulas LHS >= RHS. *)
-val (>=?) : int formula -> int formula -> int system
-
-(** Shorthand for creating a bool formula that determines if for two float formulas LHS >= RHS. *)
-val (>=.) : float formula -> float formula -> float system
 
 (** Create an equation that determines if two int formula are equal. *)
 val lt_form_int : int formula -> int formula -> int system
@@ -146,7 +139,31 @@ val lte_form_int : int formula -> int formula -> int system
 (** Create an equation that determines if two float formula are not equal. *)
 val lte_form_float : float formula -> float formula -> float system
 
-(** Shorthand predicate constructors. *)
+(** {2 Shorthand Fundamental [system] Constructors} *)
+
+(** Shorthand for creating a equation that determines if two int formulas are equal. *)
+val (=?) : int formula -> int formula -> int system
+
+(** Shorthand for creating a bool formula that determines if two float formulas are equal. *)
+val (=.) : float formula -> float formula -> float system
+
+(** Shorthand for creating a equation that determines if two int formulas are not equal. *)
+val (<>?) : int formula -> int formula -> int system
+
+(** Shorthand for creating a bool formula that determines if two float formulas are not equal. *)
+val (<>.) : float formula -> float formula -> float system
+
+(** Shorthand for creating a equation that determines if for two int formulas LHS > RHS. *)
+val (>?) : int formula -> int formula -> int system
+
+(** Shorthand for creating a bool formula that determines if two float formulas LHS > RHS. *)
+val (>.) : float formula -> float formula -> float system
+
+(** Shorthand for creating a equation that determines if for two int formulas LHS >= RHS. *)
+val (>=?) : int formula -> int formula -> int system
+
+(** Shorthand for creating a bool formula that determines if for two float formulas LHS >= RHS. *)
+val (>=.) : float formula -> float formula -> float system
 
 (** Shorthand for creating a equation that determines if for two int formulas LHS < RHS. *)
 val (<?) : int formula -> int formula -> int system
@@ -160,7 +177,9 @@ val (<=?) : int formula -> int formula -> int system
 (** Shorthand for creating a bool formula that determines if for two float formulas LHS <= RHS. *)
 val (<=.) : float formula -> float formula -> float system
 
-(** Combine equations *)
+(** {2 Combine [system] types} *)
+
+(* Connect equations via and or or. Shorthand mentioned later. *)
 
 (** And two equations together *)
 val and_eqs : 'a system -> 'a system -> 'a system
@@ -168,13 +187,15 @@ val and_eqs : 'a system -> 'a system -> 'a system
 (** Or two equations together *)
 val or_eqs : 'a system -> 'a system -> 'a system
 
+(** {2 Shorthand Combine [system] types} *)
+
 (** Shorthand for anding two equations together. *)
 val (&&) : 'a system -> 'a system -> 'a system
 
 (** Shorthand for oring two equations together. *)
 val (||) : 'a system -> 'a system -> 'a system
 
-(** Source utilities *)
+(** {1 [source] Operations} *)
 
 type 'a source
 
@@ -187,16 +208,22 @@ val make_float_source : unit -> int source
 (** Listen with a specified source *)
 val listen : 'a source -> unit
 
-(** Event listener constructors *)
+(** Note: 
+  Refining event listeners via the [source] type with [exec_while] is mentioned in the next section! 
+*)
 
-(** Listen and execute a function when a formula changes value. *)
+(** {1 Event listener constructors} *)
+
+(** Listen and execute a function when a [formula] changes value. *)
 val on_change : 'a formula -> (unit -> unit) -> unit
 
-(** Listen and execute a function when a formula changes value. *)
+(** Listen and execute a function when a [system] changes value. *)
 val system_change : 'a system -> (unit -> unit) -> unit
 
-(** Listen and execute when an equation becomes true *)
+(** Listen and execute when a [system] becomes true *)
 val when_satisfied : 'a system -> (unit -> unit) -> unit
 
-(** Source event listener. Execute function if the predicate is true and listen is called. *)
+(** Source event listener. Suppose [s] has registered a system [eq].
+    Execute function if the [eq] is currently [true] and [listen s] is called.
+*)
 val exec_while : 'a source -> 'a system -> (unit -> unit) -> unit
