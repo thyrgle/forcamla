@@ -39,7 +39,7 @@ open Formula (* To use formula *)
 let x = t 2 (* Create an integer term called x *)
 let y = t 2 (* Create an integer term called y *)
 let z = x + y
-x =: 3 (* Set x to 3, and z now is 5 *)
+let () = x =: 3 (* Set x to 3, and z now is 5 *)
 ]}
 
 But it gets even better!
