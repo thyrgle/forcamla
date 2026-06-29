@@ -1,7 +1,5 @@
 ![forcamla logo](forcamla_logo.svg)
 
-# forcamla
-
 ## What is forcamla?
 
 We start by learning constants in OCaml as ways to have names hold values for us to use later. For instance,
