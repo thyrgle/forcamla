@@ -1,3 +1,5 @@
+![forcamla logo](forcamla_logo.svg)
+
 # forcamla
 
 ## What is forcamla?
