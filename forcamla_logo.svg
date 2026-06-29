@@ -5,9 +5,31 @@
    viewBox="0 -705 15646.492 3839.5834"
    version="1.1"
    id="svg12"
+   sodipodi:docname="forcamla_logo.svg"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="6.2889262"
+     inkscape:cx="141.5981"
+     inkscape:cy="34.823115"
+     inkscape:window-width="1920"
+     inkscape:window-height="1022"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg12" />
   <defs
      id="defs1">
     <path
@@ -41,7 +63,7 @@
      stroke-width="0"
      transform="matrix(4.219658,0,0,-4.219658,-223.64187,2269.8227)"
      id="g12"
-     style="fill:#ff0000">
+     style="fill:#f25e0a;fill-opacity:1">
     <g
        data-mml-node="math"
        data-latex="f\mathsf{orcamla}"
@@ -57,7 +79,7 @@
        data-speech-node="true"
        data-semantic-structure="(3 0 2 1)"
        id="g11"
-       style="fill:#ff0000">
+       style="fill:#f25e0a;fill-opacity:1">
       <g
          data-mml-node="mi"
          data-latex="f"
@@ -72,12 +94,12 @@
          aria-level="1"
          data-speech-node="true"
          id="g1"
-         style="fill:#ff0000">
+         style="fill:#f25e0a;fill-opacity:1">
         <use
            data-c="1D453"
            xlink:href="#MJX-8-NCM-I-1D453"
            id="use1"
-           style="fill:#ff0000" />
+           style="fill:#f25e0a;fill-opacity:1" />
       </g>
       <g
          data-mml-node="mo"
@@ -92,12 +114,12 @@
          data-speech-node="true"
          transform="translate(552)"
          id="g2"
-         style="fill:#ff0000">
+         style="fill:#f25e0a;fill-opacity:1">
         <use
            data-c="2061"
            xlink:href="#MJX-8-NCM-N-2061"
            id="use2"
-           style="fill:#ff0000" />
+           style="fill:#f25e0a;fill-opacity:1" />
       </g>
       <g
          data-mml-node="TeXAtom"
@@ -105,7 +127,7 @@
          data-latex="\mathsf{orcamla}"
          transform="translate(552)"
          id="g10"
-         style="fill:#ff0000">
+         style="fill:#f25e0a;fill-opacity:1">
         <g
            data-mml-node="mi"
            data-latex="orcamla"
@@ -119,48 +141,48 @@
            aria-level="1"
            data-speech-node="true"
            id="g9"
-           style="fill:#ff0000">
+           style="fill:#f25e0a;fill-opacity:1">
           <use
              data-c="1D5C8"
              xlink:href="#MJX-8-NCM-SS-1D5C8"
              id="use3"
-             style="fill:#ff0000" />
+             style="fill:#f25e0a;fill-opacity:1" />
           <use
              data-c="1D5CB"
              xlink:href="#MJX-8-NCM-SS-1D5CB"
              transform="translate(500)"
              id="use4"
-             style="fill:#ff0000" />
+             style="fill:#f25e0a;fill-opacity:1" />
           <use
              data-c="1D5BC"
              xlink:href="#MJX-8-NCM-SS-1D5BC"
              transform="translate(842)"
              id="use5"
-             style="fill:#ff0000" />
+             style="fill:#f25e0a;fill-opacity:1" />
           <use
              data-c="1D5BA"
              xlink:href="#MJX-8-NCM-SS-1D5BA"
              transform="translate(1286)"
              id="use6"
-             style="fill:#ff0000" />
+             style="fill:#f25e0a;fill-opacity:1" />
           <use
              data-c="1D5C6"
              xlink:href="#MJX-8-NCM-SS-1D5C6"
              transform="translate(1767)"
              id="use7"
-             style="fill:#ff0000" />
+             style="fill:#f25e0a;fill-opacity:1" />
           <use
              data-c="1D5C5"
              xlink:href="#MJX-8-NCM-SS-1D5C5"
              transform="translate(2561)"
              id="use8"
-             style="fill:#ff0000" />
+             style="fill:#f25e0a;fill-opacity:1" />
           <use
              data-c="1D5BA"
              xlink:href="#MJX-8-NCM-SS-1D5BA"
              transform="translate(2800)"
              id="use9"
-             style="fill:#ff0000" />
+             style="fill:#f25e0a;fill-opacity:1" />
         </g>
       </g>
     </g>
