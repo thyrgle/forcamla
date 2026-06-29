@@ -1,4 +1,6 @@
-![forcamla logo](forcamla_logo.svg)
+<p align="center">
+  <img src="forcamla_logo.svg" alt="forcamla">
+</p>
 
 ## What is forcamla?
 
