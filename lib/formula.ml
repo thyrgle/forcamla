@@ -10,10 +10,10 @@ and _ formula =
   Const : { const: 'a } -> 'a formula
 | Val : 
   {
-    value : 'c ref;
+    value : 'b ref;
     mutable parents: any_formula list;
-    mutable on_change: ('c -> 'c -> unit) list;
-  } -> 'c formula
+    mutable on_change: ('b -> 'b -> unit) list;
+  } -> 'b formula
 | ValBool :
   {
     value : bool ref;
@@ -23,16 +23,16 @@ and _ formula =
   } -> bool formula
 | UnaryOp : 
   {
-    op : 'e -> 'f;
-    child: 'e formula;
+    op : 'c -> 'd;
+    child: 'c formula;
     mutable parents: any_formula list;
-    cached_val: 'f ref;
-    mutable on_change: ('f -> 'f -> unit) list;
-  } -> 'f formula
+    cached_val: 'd ref;
+    mutable on_change: ('d -> 'd -> unit) list;
+  } -> 'd formula
 | UnaryBool :
   {
-    op : 'h -> bool;
-    child: 'h formula;
+    op : 'e -> bool;
+    child: 'e formula;
     mutable parents: any_formula list;
     cached_val: bool ref;
     mutable on_change: (bool -> bool -> unit) list;
@@ -40,18 +40,18 @@ and _ formula =
   } -> bool formula
 | BinOp : 
   {
-    op : 'a -> 'b -> 'c;
-    lhs: 'a formula;
-    rhs: 'b formula;
+    op : 'f -> 'g -> 'h;
+    lhs: 'f formula;
+    rhs: 'g formula;
     mutable parents: any_formula list;
-    mutable cached_val: 'c ref;
-    mutable on_change: ('c -> 'c -> unit) list;
-  } -> 'c formula
+    mutable cached_val: 'h ref;
+    mutable on_change: ('h -> 'h -> unit) list;
+  } -> 'h formula
 | BinBool : 
   {
-    op : 'a -> 'b -> bool; 
-    lhs: 'a formula;
-    rhs: 'b formula;
+    op : 'i -> 'j -> bool; 
+    lhs: 'i formula;
+    rhs: 'j formula;
     mutable parents: any_formula list; 
     cached_val: bool ref;
     mutable on_change: (bool -> bool -> unit) list;
@@ -77,13 +77,13 @@ let rec eval : type h. h formula -> h = function
     | BinBool {op; lhs; rhs; _} -> op (eval lhs) (eval rhs)
 
 (* Construct a formula of a single term. *)
-let v (value: 'n): 'n formula =
+let v (value: 'a): 'a formula =
   Val { parents=[]; value=ref value; on_change=[];}
 
 let c (value: 'a): 'a formula =
   Const {const = value}
 
-let rec propagate : type i. i formula -> unit = fun f ->
+let rec propagate : type a. a formula -> unit = fun f ->
   match f with
   | Const {const; _} -> ()
   | Val {value; _} -> ()
@@ -124,7 +124,7 @@ let rec propagate : type i. i formula -> unit = fun f ->
       else ()
 
 
-let update_term (type j) (t: j formula) (new_val: j) =
+let update_term (type a) (t: a formula) (new_val: a) =
   match t with
   | Val {value; parents; on_change} ->
       let old_val = !value in
@@ -139,9 +139,9 @@ let update_term (type j) (t: j formula) (new_val: j) =
 let (=:) = update_term
 
 (* Extract values. Basically the same as (!) for reference types. *)
-let (!) (f: 'o formula) = eval f
+let (!) (f: 'a formula) = eval f
 
-let add_parent (type i j) (parent: i formula) (child: j formula) : unit =
+let add_parent (type a b) (parent: a formula) (child: b formula) : unit =
   let boxed = Any parent in
   match child with
   | Const _ -> ()
@@ -153,7 +153,7 @@ let add_parent (type i j) (parent: i formula) (child: j formula) : unit =
   | BinBool bb -> bb.parents <- boxed :: bb.parents
 
 (* Create (generic) unary operation. *)
-let reg_unary (f: 'k -> 'm) =
+let reg_unary (f: 'a -> 'b) =
   fun child -> 
     let node = 
       UnaryOp 
@@ -168,7 +168,7 @@ let reg_unary (f: 'k -> 'm) =
     node
 
 (* Create (generic) unary operation. *)
-let reg_unary_bool (f: 'k -> bool) =
+let reg_unary_bool (f: 'a -> bool) =
   fun child -> 
     let node = 
       UnaryBool
@@ -185,7 +185,7 @@ let reg_unary_bool (f: 'k -> bool) =
 
 
 (* Create (generic) binary operation. *)
-let reg_bin (f: 'k -> 'l -> 'm) =
+let reg_bin (f: 'a -> 'b -> 'c) =
   fun lhs rhs -> 
     let node = 
       BinOp 
@@ -202,7 +202,7 @@ let reg_bin (f: 'k -> 'l -> 'm) =
     node
 
 (* Create binary operation that returns a bool. *)
-let reg_bin_bool (f: 'k -> 'l -> bool) =
+let reg_bin_bool (f: 'a -> 'b -> bool) =
   fun lhs rhs -> 
     let node = 
       BinBool

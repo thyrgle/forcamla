@@ -14,34 +14,34 @@ type 'a formula
 *)
 
 (** Lift basic types to term types. *)
-val v : 'c -> 'c formula
+val v : 'a -> 'a formula
 
 (** Create a constant. Cannot be changed, but is more space efficient than a [Val] type. *)
-val c : 'b -> 'b formula
+val c : 'a -> 'a formula
 
 (** {1 Update Term Methods} *)
 
 (** Update a term to a new value. (If the supplied formula is {i not} a term, an error is thrown.) *)
-val (=:) : 'd formula -> 'd -> unit
+val (=:) : 'a formula -> 'a -> unit
 
 (** {1 Extraction: Get the (current) value for a [formula]} *)
 
 (** Get current value of a formula. An analog to [(!)] for ref types. *)
-val (!) : 'e formula -> 'e
+val (!) : 'a formula -> 'a
 
 (** {2 Register custom operator} *)
 
 (** Register a (generic) unary operation. *)
-val reg_unary : ('r -> 's) -> ('r formula -> 's formula)
+val reg_unary : ('a -> 'b) -> ('a formula -> 'b formula)
 
 (** Register a unary operation that returns a bool. Allows for [when_satisfied] field. *)
 val reg_unary_bool : ('r -> bool) -> ('r formula -> bool formula)
 
 (** Register a (generic) binary operation. *)
-val reg_bin : ('r -> 's -> 't) -> ('r formula -> 's formula -> 't formula)
+val reg_bin : ('a -> 'b -> 'c) -> ('a formula -> 'b formula -> 'c formula)
 
 (** Register a binary operation that returns a bool. Allows for [when_satisfied] field. *)
-val reg_bin_bool : ('r -> 's -> bool) -> ('r formula -> 's formula -> bool formula)
+val reg_bin_bool : ('a -> 'b -> bool) -> ('a formula -> 'b formula -> bool formula)
 
 (** {1 Built-in [formula] creation methods} *)
 
@@ -134,42 +134,42 @@ val (||) : bool formula -> bool formula -> bool formula
 (** Shorthand versions below! *)
 
 (** Create an equation that determines if two int formula are equal. *)
-val eq_form : 'e formula -> 'e formula -> bool formula
+val eq_form : 'a formula -> 'a formula -> bool formula
 
 (** Create an equation that determines if two int formula are not equal. *)
-val neq_form : 'f formula -> 'f formula -> bool formula
+val neq_form : 'a formula -> 'a formula -> bool formula
 
 (** Create an equation that determines if two int formula are equal. *)
-val gt_form : 'g formula -> 'g formula -> bool formula
+val gt_form : 'a formula -> 'a formula -> bool formula
 
 (** Create an equation that determines if two int formula are not equal. *)
-val gte_form : 'h formula -> 'h formula -> bool formula
+val gte_form : 'a formula -> 'a formula -> bool formula
 
 (** Create an equation that determines if two int formula are equal. *)
-val lt_form : 'i formula -> 'i formula -> bool formula
+val lt_form : 'a formula -> 'a formula -> bool formula
 
 (** Create an equation that determines if two int formula are not equal. *)
-val lte_form : 'j formula -> 'j formula -> bool formula
+val lte_form : 'a formula -> 'a formula -> bool formula
 
 (** {3 Shorthand comparison operators} *)
 
 (** Shorthand for creating a equation that determines if two int formulas are equal. *)
-val (=) : 'e formula -> 'e formula -> bool formula
+val (=) : 'a formula -> 'a formula -> bool formula
 
 (** Shorthand for creating a equation that determines if two int formulas are not equal. *)
-val (<>) : 'f formula -> 'f formula -> bool formula
+val (<>) : 'a formula -> 'a formula -> bool formula
 
 (** Shorthand for creating a equation that determines if for two int formulas LHS > RHS. *)
-val (>) : 'g formula -> 'g formula -> bool formula
+val (>) : 'a formula -> 'a formula -> bool formula
 
 (** Shorthand for creating a equation that determines if for two int formulas LHS >= RHS. *)
-val (>=) : 'h formula -> 'h formula -> bool formula
+val (>=) : 'a formula -> 'a formula -> bool formula
 
 (** Shorthand for creating a equation that determines if for two int formulas LHS < RHS. *)
-val (<) : 'i formula -> 'i formula -> bool formula
+val (<) : 'a formula -> 'a formula -> bool formula
 
 (** Shorthand for creating a equation that determines if for two int formulas LHS <= RHS. *)
-val (<=) : 'j formula -> 'j formula -> bool formula
+val (<=) : 'a formula -> 'a formula -> bool formula
 
 (** {1 [source] Construction and Listening} *)
 
@@ -188,7 +188,7 @@ val listen : source -> unit
 (** {2 Event listener creation} *)
 
 (** Listen and execute a function when a [formula] changes value. *)
-val on_change : 'o formula -> ('o -> 'o -> unit) -> unit
+val on_change : 'a formula -> ('a -> 'a -> unit) -> unit
 
 (** Listen and execute when a [bool formula] becomes true. *)
 val when_satisfied : bool formula -> (unit -> unit) -> unit
