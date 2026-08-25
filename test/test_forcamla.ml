@@ -128,20 +128,20 @@ let test_term_form_update () =
 let test_simple_eq_no_change () =
   let open Formula in
   let x = t 1 in
-  let y = x =? (t 0) in
-  (check bool) "same bool" false !!y
+  let y = x = (t 0) in
+  (check bool) "same bool" false !y
 
 let test_simple_eq () =
   let open Formula in
   let x = t 1 in
-  let y = x =? (t 0) in
+  let y = x = (t 0) in
   x =: !(x - t 1);
-  (check bool) "same bool" true !!y
+  (check bool) "same bool" true !y
   
 let test_simple_sat () =
   let open Formula in
   let x = t 1 in
-  let y = x =? (t 0) in
+  let y = x = (t 0) in
   let z = ref 1 in
   when_satisfied y (fun () : unit -> (z := 2));
   x =: !(x - t 1);
@@ -153,7 +153,7 @@ let test_player_health_go () =
   let g () = x := "Game Over" in
   let open Formula in
   let health = t 3 in
-  when_satisfied (health =? t 0) g;
+  when_satisfied (health = t 0) g;
   health =: !(health - t 1);
   health =: !(health - t 1);
   health =: !(health - t 1);
@@ -164,7 +164,7 @@ let test_player_health_ip () =
   let g () = x := "Game Over" in
   let open Formula in
   let health = t 3 in
-  when_satisfied (health =? t 0) g;
+  when_satisfied (health = t 0) g;
   health =: !(health - t 1);
   health =: !(health - t 1);
   (check string) "same string" "In Play" x.contents
@@ -175,7 +175,7 @@ let test_source_simple_while () =
   let open Formula in
   let s = make_source () in
   let y = t 0 in
-  let test = (y >=? t 3) in
+  let test = (y >= t 3) in
   exec_while s test g;
   listen s;
   y =: !(y + t 1);
@@ -194,7 +194,7 @@ let test_source_simple_always () =
   let open Formula in
   let s = make_source () in
   let y = t 0 in
-  let test = (y >=? t 1) in
+  let test = (y >= t 1) in
   exec_always s test g;
   (check bool) "same bool" true x.contents;
   listen s;
@@ -285,7 +285,7 @@ let test_concat_named () =
 
 let test_custom_binop () =
   let open Formula in
-  let max_f = formula_reg_bin max in
+  let max_f = reg_bin max in
   let x = t 3 in
   let y = t 7 in
   let m = max_f x y in
@@ -296,57 +296,57 @@ let test_custom_binop () =
 let test_gt_int () =
   let open Formula in
   let x = t 5 in
-  let eq = x >? t 3 in
-  (check bool) "5 > 3" true !!eq;
+  let eq = x > t 3 in
+  (check bool) "5 > 3" true !eq;
   x =: 2;
-  (check bool) "2 > 3" false !!eq
+  (check bool) "2 > 3" false !eq
 
 let test_gte_int () =
   let open Formula in
   let x = t 5 in
-  let eq = x >=? t 5 in
-  (check bool) "5 >= 5" true !!eq;
+  let eq = x >= t 5 in
+  (check bool) "5 >= 5" true !eq;
   x =: 4;
-  (check bool) "4 >= 5" false !!eq
+  (check bool) "4 >= 5" false !eq
 
 let test_neq_int () =
   let open Formula in
   let x = t 1 in
-  let eq = x <>? t 2 in
-  (check bool) "1 != 2" true !!eq;
+  let eq = x <> t 2 in
+  (check bool) "1 != 2" true !eq;
   x =: 2;
-  (check bool) "2 != 2" false !!eq
+  (check bool) "2 != 2" false !eq
 
 let test_lt_int_after_update () =
   let open Formula in
   let x = t 2 in
-  let eq = x <? t 5 in
+  let eq = x < t 5 in
   x =: 8;
-  (check bool) "8 < 5" false !!eq;
+  (check bool) "8 < 5" false !eq;
   x =: 4;
-  (check bool) "4 < 5" true !!eq
+  (check bool) "4 < 5" true !eq
 
 let test_lt_lte_initial () =
   let open Formula in
   let x = t 2 in
-  (check bool) "2 < 5" true !!(x <? t 5);
-  (check bool) "2 <= 2" true !!(x <=? t 2);
+  (check bool) "2 < 5" true !(x < t 5);
+  (check bool) "2 <= 2" true !(x <= t 2);
   let f = t 2.5 in
-  (check bool) "2.5 < 3.0" true !!(f <. t 3.0);
-  (check bool) "2.5 <= 2.5" true !!(f <=. t 2.5);
+  (check bool) "2.5 < 3.0" true !(f < t 3.0);
+  (check bool) "2.5 <= 2.5" true !(f <= t 2.5);
   x =: 7;
-  (check bool) "7 < 5" false !!(x <? t 5);
-  (check bool) "7 <= 2" false !!(x <=? t 2)
+  (check bool) "7 < 5" false !(x < t 5);
+  (check bool) "7 <= 2" false !(x <= t 2)
 
 let test_float_cmp () =
   let open Formula in
   let x = t 2.5 in
-  (check bool) "2.5 > 2.0" true !!(x >. t 2.0);
-  (check bool) "2.5 >= 2.5" true !!(x >=. t 2.5);
-  (check bool) "2.5 = 2.5" true !!(x =. t 2.5);
-  (check bool) "2.5 != 3.0" true !!(x <>. t 3.0);
+  (check bool) "2.5 > 2.0" true !(x > t 2.0);
+  (check bool) "2.5 >= 2.5" true !(x >= t 2.5);
+  (check bool) "2.5 = 2.5" true !(x = t 2.5);
+  (check bool) "2.5 != 3.0" true !(x <> t 3.0);
   x =: 1.5;
-  (check bool) "1.5 >= 2.5" false !!(x >=. t 2.5)
+  (check bool) "1.5 >= 2.5" false !(x >= t 2.5)
 
 let test_on_change_formula () =
   let open Formula in
@@ -366,22 +366,11 @@ let test_on_change_term () =
   x =: 9;
   (check (list (pair int int))) "old and new" [(2, 9)] changes.contents
 
-let test_system_change () =
-  let open Formula in
-  let changes = ref [] in
-  let x = t 5 in
-  let eq = x =? t 1 in
-  system_change eq (fun o n -> changes := (o, n) :: changes.contents);
-  x =: 4;
-  x =: 1;
-  x =: 2;
-  (check (list (pair bool bool))) "transitions" [(true, false); (false, true)] changes.contents
-
 let test_when_satisfied_refires () =
   let open Formula in
   let count = ref 0 in
   let x = t 3 in
-  when_satisfied (x =? t 1) (fun () -> incr count);
+  when_satisfied (x = t 1) (fun () -> incr count);
   x =: 2;
   x =: 1;
   (check int) "fired first time" 1 count.contents;
@@ -392,37 +381,37 @@ let test_when_satisfied_refires () =
 let test_sys_and () =
   let open Formula in
   let x = t 1 in
-  let sys = (x >=? t 1) && (x <=? t 3) in
-  (check bool) "1 in [1,3]" true !!sys;
+  let sys = (x >= t 1) && (x <= t 3) in
+  (check bool) "1 in [1,3]" true !sys;
   x =: 0;
-  (check bool) "0 in [1,3]" false !!sys;
+  (check bool) "0 in [1,3]" false !sys;
   x =: 2;
-  (check bool) "2 in [1,3]" true !!sys;
+  (check bool) "2 in [1,3]" true !sys;
   x =: 4;
-  (check bool) "4 in [1,3]" false !!sys
+  (check bool) "4 in [1,3]" false !sys
 
 let test_sys_or () =
   let open Formula in
   let x = t 5 in
-  let sys = (x =? t 1) || (x =? t 5) in
-  (check bool) "5 is 1 or 5" true !!sys;
+  let sys = (x = t 1) || (x = t 5) in
+  (check bool) "5 is 1 or 5" true !sys;
   x =: 2;
-  (check bool) "2 is 1 or 5" false !!sys;
+  (check bool) "2 is 1 or 5" false !sys;
   x =: 1;
-  (check bool) "1 is 1 or 5" true !!sys
+  (check bool) "1 is 1 or 5" true !sys
 
 let test_sys_nested () =
   let open Formula in
   let x = t 1 in
-  let in_range = (x >=? t 1) && (x <=? t 3) in
-  let sys = in_range || (x =? t 10) in
-  (check bool) "1 in range" true !!sys;
+  let in_range = (x >= t 1) && (x <= t 3) in
+  let sys = in_range || (x = t 10) in
+  (check bool) "1 in range" true !sys;
   x =: 10;
-  (check bool) "10 special" true !!sys;
+  (check bool) "10 special" true !sys;
   x =: 5;
-  (check bool) "5 nothing" false !!sys;
+  (check bool) "5 nothing" false !sys;
   x =: 2;
-  (check bool) "2 in range" true !!sys
+  (check bool) "2 in range" true !sys
 
 let test_form_and () =
   let open Formula in
@@ -489,7 +478,7 @@ let test_when_satisfied_and () =
   let open Formula in
   let count = ref 0 in
   let x = t 1 in
-  let sys = (x >=? t 1) && (x <=? t 3) in
+  let sys = (x >= t 1) && (x <= t 3) in
   when_satisfied sys (fun () -> incr count);
   (check int) "no fire yet" 0 count.contents;
   x =: 2;
@@ -499,21 +488,11 @@ let test_when_satisfied_and () =
   x =: 2;
   (check int) "fired" 1 count.contents
 
-let test_system_change_and () =
-  let open Formula in
-  let changes = ref [] in
-  let x = t 1 in
-  let sys = (x >=? t 1) && (x <=? t 3) in
-  system_change sys (fun o n -> changes := (o, n) :: changes.contents);
-  x =: 4;
-  x =: 2;
-  (check (list (pair bool bool))) "transitions" [(false, true); (true, false)] changes.contents
-
 let test_when_satisfied_no_refire_while_true () =
   let open Formula in
   let count = ref 0 in
   let x = t 1 in
-  let eq = x =? t 1 in
+  let eq = x = t 1 in
   when_satisfied eq (fun () -> incr count);
   x =: 1;
   x =: 2;
@@ -533,7 +512,7 @@ let test_exec_always_values () =
   let open Formula in
   let s = make_source () in
   let x = t 0 in
-  let test = x >=? t 2 in
+  let test = x >= t 2 in
   exec_always s test (fun b -> seen := b :: seen.contents);
   listen s;
   (check (list bool)) "values" [false] seen.contents;
@@ -549,7 +528,7 @@ let test_exec_while_stops () =
   let open Formula in
   let s = make_source () in
   let x = t 0 in
-  exec_while s (x >=? t 3) (fun () -> incr calls);
+  exec_while s (x >= t 3) (fun () -> incr calls);
   listen s;
   x =: 1;
   listen s;
@@ -567,7 +546,7 @@ let test_source_health () =
   let open Formula in
   let s = make_source () in
   let hp = t 2 in
-  exec_while s (hp =? t 0) (fun () -> status := "dead");
+  exec_while s (hp = t 0) (fun () -> status := "dead");
   hp =: 1;
   listen s;
   (check string) "alive" "alive" status.contents;
@@ -636,11 +615,9 @@ let () =
       "listeners", [
         test_case "on_change on formula" `Quick test_on_change_formula;
         test_case "on_change on term" `Quick test_on_change_term;
-        test_case "system_change" `Quick test_system_change;
         test_case "when_satisfied refires" `Quick test_when_satisfied_refires;
         test_case "when_satisfied no refire while true" `Quick test_when_satisfied_no_refire_while_true;
         test_case "when_satisfied on and-system" `Quick test_when_satisfied_and;
-        test_case "system_change on and-system" `Quick test_system_change_and;
       ];
       "errors", [
         test_case "Assigning to non-term raises" `Quick test_assign_non_term_raises;

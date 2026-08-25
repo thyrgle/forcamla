@@ -5,9 +5,6 @@
 (** A combination of terms (similar to variables) and operations that represent a mathematical formula *)
 type 'a formula
 
-(** A collecction of equations (possibly a collection of one equation). {b Note:} For type safety reasons, [system] type is distinct from the [formula] type. *)
-type 'b system
-
 (** {1 Term Creation} *)
 
 (** Terms are of type [formula]. In particular, a {i term} refers to a [formula] with no binary operations.
@@ -28,8 +25,9 @@ val (=:) : 'd formula -> 'd -> unit
 (** Get current value of a formula. Similar to [(!)] for ref types. *)
 val (!) : 'e formula -> 'e
 
-(** Get current value of a system. Similar to [(!)] for ref types. *)
-val (!!) : 'f system -> bool
+(** {2 Register custom operator} *)
+
+val reg_bin : ('r -> 's -> 't) -> ('r formula -> 's formula -> 't formula)
 
 (** {1 Formula creation methods} *)
 
@@ -120,111 +118,64 @@ val or_ : bool formula -> bool formula -> bool formula
 *)
 
 (** Create an equation that determines if two int formula are equal. *)
-val eq_form_int : int formula -> int formula -> int system
-
-(** Create an equation that determines if two float formula are equal. *)
-val eq_form_float : float formula -> float formula -> float system
+val eq_form : 'e formula -> 'e formula -> bool formula
 
 (** Create an equation that determines if two int formula are not equal. *)
-val ne_form_int : int formula -> int formula -> int system
-
-(** Create an equation that determines if two float formula are not equal. *)
-val ne_form_float : float formula -> float formula -> float system
+val neq_form : 'f formula -> 'f formula -> bool formula
 
 (** Create an equation that determines if two int formula are equal. *)
-val gt_form_int : int formula -> int formula -> int system
-
-(** Create an equation that determines if two float formula are equal. *)
-val gt_form_float : float formula -> float formula -> float system
+val gt_form : 'g formula -> 'g formula -> bool formula
 
 (** Create an equation that determines if two int formula are not equal. *)
-val gte_form_int : int formula -> int formula -> int system
-
-(** Create an equation that determines if two float formula are not equal. *)
-val gte_form_float : float formula -> float formula -> float system
+val gte_form : 'h formula -> 'h formula -> bool formula
 
 (** Create an equation that determines if two int formula are equal. *)
-val lt_form_int : int formula -> int formula -> int system
-
-(** Create an equation that determines if two float formula are equal. *)
-val lt_form_float : float formula -> float formula -> float system
+val lt_form : 'i formula -> 'i formula -> bool formula
 
 (** Create an equation that determines if two int formula are not equal. *)
-val lte_form_int : int formula -> int formula -> int system
-
-(** Create an equation that determines if two float formula are not equal. *)
-val lte_form_float : float formula -> float formula -> float system
+val lte_form : 'j formula -> 'j formula -> bool formula
 
 (** {2 Shorthand Fundamental [system] Constructors} *)
 
 (** Shorthand for creating a equation that determines if two int formulas are equal. *)
-val (=?) : int formula -> int formula -> int system
-
-(** Shorthand for creating a bool formula that determines if two float formulas are equal. *)
-val (=.) : float formula -> float formula -> float system
+val (=) : 'e formula -> 'e formula -> bool formula
 
 (** Shorthand for creating a equation that determines if two int formulas are not equal. *)
-val (<>?) : int formula -> int formula -> int system
-
-(** Shorthand for creating a bool formula that determines if two float formulas are not equal. *)
-val (<>.) : float formula -> float formula -> float system
+val (<>) : 'f formula -> 'f formula -> bool formula
 
 (** Shorthand for creating a equation that determines if for two int formulas LHS > RHS. *)
-val (>?) : int formula -> int formula -> int system
-
-(** Shorthand for creating a bool formula that determines if two float formulas LHS > RHS. *)
-val (>.) : float formula -> float formula -> float system
+val (>) : 'g formula -> 'g formula -> bool formula
 
 (** Shorthand for creating a equation that determines if for two int formulas LHS >= RHS. *)
-val (>=?) : int formula -> int formula -> int system
-
-(** Shorthand for creating a bool formula that determines if for two float formulas LHS >= RHS. *)
-val (>=.) : float formula -> float formula -> float system
+val (>=) : 'h formula -> 'h formula -> bool formula
 
 (** Shorthand for creating a equation that determines if for two int formulas LHS < RHS. *)
-val (<?) : int formula -> int formula -> int system
-
-(** Shorthand for creating a bool formula that determines if two float formulas LHS < RHS. *)
-val (<.) : float formula -> float formula -> float system
+val (<) : 'i formula -> 'i formula -> bool formula
 
 (** Shorthand for creating a equation that determines if for two int formulas LHS <= RHS. *)
-val (<=?) : int formula -> int formula -> int system
-
-(** Shorthand for creating a bool formula that determines if for two float formulas LHS <= RHS. *)
-val (<=.) : float formula -> float formula -> float system
+val (<=) : 'j formula -> 'j formula -> bool formula
 
 (** {2 Combine [system] types} *)
 
 (* Connect equations via and or or. Shorthand mentioned later. *)
 
-(** And two equations together *)
-val and_eqs : 'g system -> 'g system -> 'g system
-
-(** Or two equations together *)
-val or_eqs : 'h system -> 'h system -> 'h system
-
 (** {2 Shorthand Combine [system] types} *)
 
 (** Shorthand for anding two equations together. *)
-val (&&) : 'i system -> 'i system -> 'i system
+val (&&) : bool formula -> bool formula -> bool formula
 
 (** Shorthand for oring two equations together. *)
-val (||) : 'j system -> 'j system -> 'j system
-
-(** Create a binary operation from an operation that takes 'a type inputs. In
- essence, lift an existing binary operator work on formulas. *)
-val formula_reg_bin : ('k -> 'k -> 'k) -> ('k formula -> 'k formula -> 'k formula)
-
+val (||) : bool formula -> bool formula -> bool formula
 
 (** {1 [source] Operations} *)
 
-type 'l source
+type source
 
 (** Make a source to listen with. *)
-val make_source : unit -> 'm source
+val make_source : unit -> source
 
 (** Listen with a specified source *)
-val listen : 'n source -> unit
+val listen : source -> unit
 
 (** Note: 
   Refining event listeners via the [source] type with [exec_while] is mentioned in the next section! 
@@ -235,19 +186,15 @@ val listen : 'n source -> unit
 (** Listen and execute a function when a [formula] changes value. *)
 val on_change : 'o formula -> ('o -> 'o -> unit) -> unit
 
-(** Listen and execute a function when a [system] changes value. *)
-val system_change : 'p system -> (bool -> bool -> unit) -> unit
-
 (** Listen and execute when a [system] becomes true. *)
-val when_satisfied : 'q system -> (unit -> unit) -> unit
+val when_satisfied : bool formula -> (unit -> unit) -> unit
 
 (** Source event listener. Suppose [s] has registered a system [eq].
     Execute function if [listen s] is called and supply the current value of [eq].
 *)
-val exec_always : 'r source -> 'r system -> (bool -> unit) -> unit
+val exec_always : source -> bool formula -> (bool -> unit) -> unit
 
 (** Source event listener. Suppose [s] has registered a system [eq].
     Execute function if the [eq] is currently [true] and [listen s] is called.
 *)
-val exec_while : 's source -> 's system -> (unit -> unit) -> unit
-
+val exec_while : source -> bool formula -> (unit -> unit) -> unit
