@@ -1,6 +1,9 @@
 (* Needed for trying to assign a complex formula a value. *)
 exception NotATermException of string
 
+(* For when_satisfied applied to non-boolean type. *)
+exception NotABoolException of string
+
 type any_formula = Any : _ formula -> any_formula
 (* Stores the arithmetic expression of a formula. *)
 and _ formula =
@@ -10,8 +13,14 @@ and _ formula =
     value : 'c ref;
     mutable parents: any_formula list;
     mutable on_change: ('c -> 'c -> unit) list;
-    mutable when_satisfied: (unit -> unit) list
   } -> 'c formula
+| ValBool :
+  {
+    value : bool ref;
+    mutable parents: any_formula list;
+    mutable on_change: (bool -> bool -> unit) list;
+    mutable when_satisfied: (unit -> unit) list;
+  } -> bool formula
 | UnaryOp : 
   {
     op : 'e -> 'f;
@@ -19,17 +28,15 @@ and _ formula =
     mutable parents: any_formula list;
     cached_val: 'f ref;
     mutable on_change: ('f -> 'f -> unit) list;
-    mutable when_satisfied: (unit -> unit) list
   } -> 'f formula
-| Comparison : 
+| UnaryBool :
   {
-    op : 'a -> 'b -> bool; 
-    lhs: 'a formula;
-    rhs: 'b formula;
-    mutable parents: any_formula list; 
+    op : 'h -> bool;
+    child: 'h formula;
+    mutable parents: any_formula list;
     cached_val: bool ref;
     mutable on_change: (bool -> bool -> unit) list;
-    mutable when_satisfied: (unit -> unit) list
+    mutable when_satisfied: (unit -> unit) list;
   } -> bool formula
 | BinOp : 
   {
@@ -39,8 +46,18 @@ and _ formula =
     mutable parents: any_formula list;
     mutable cached_val: 'c ref;
     mutable on_change: ('c -> 'c -> unit) list;
-    mutable when_satisfied: (unit -> unit) list
   } -> 'c formula
+| BinBool : 
+  {
+    op : 'a -> 'b -> bool; 
+    lhs: 'a formula;
+    rhs: 'b formula;
+    mutable parents: any_formula list; 
+    cached_val: bool ref;
+    mutable on_change: (bool -> bool -> unit) list;
+    mutable when_satisfied: (unit -> unit) list
+  } -> bool formula
+
 
 (* Similar to 'a expr and equation_expr but for systems of equations. *)
 type source =
@@ -53,18 +70,21 @@ type source =
 let rec eval : type h. h formula -> h = function
     | Const {const; _} -> const
     | Val  {value; _} -> !value
+    | ValBool {value; _} -> !value
     | UnaryOp {op; child; _} -> op (eval child)
-    | Comparison {op; lhs; rhs; _} -> op (eval lhs) (eval rhs)
+    | UnaryBool {op; child; _} -> op (eval child)
     | BinOp {op; lhs; rhs; _} -> op (eval lhs) (eval rhs)
+    | BinBool {op; lhs; rhs; _} -> op (eval lhs) (eval rhs)
 
 (* Construct a formula of a single term. *)
 let t (value: 'n): 'n formula =
-  Val { parents=[]; value=ref value; on_change=[]; when_satisfied=[]}
+  Val { parents=[]; value=ref value; on_change=[];}
 
 let rec propagate : type i. i formula -> unit = fun f ->
   match f with
   | Const {const; _} -> ()
   | Val {value; _} -> ()
+  | ValBool {value; _} -> ()
   | UnaryOp {cached_val; parents; on_change; _} ->
       let new_val = eval f in
       if new_val <> !cached_val then
@@ -72,12 +92,15 @@ let rec propagate : type i. i formula -> unit = fun f ->
          cached_val := new_val;
          List.iter (fun (Any p) -> propagate p) parents)
       else ()
-  | Comparison {cached_val; parents; on_change; _} -> 
+  | UnaryBool {cached_val; parents; on_change; when_satisfied; _} ->
       let new_val = eval f in
       if new_val <> !cached_val then
         (List.iter (fun g -> g !cached_val new_val) on_change;
          cached_val := new_val;
          List.iter (fun (Any p) -> propagate p) parents)
+      else ();
+      if new_val = true then
+        List.iter (fun g -> g ()) when_satisfied
       else ()
   | BinOp {cached_val; parents; on_change; _} -> 
       let new_val = eval f in
@@ -86,6 +109,17 @@ let rec propagate : type i. i formula -> unit = fun f ->
          cached_val := new_val;
          List.iter (fun (Any p) -> propagate p) parents)
       else ()
+  | BinBool {cached_val; parents; on_change; when_satisfied; _} ->
+      let new_val = eval f in
+      if new_val <> !cached_val then
+        (List.iter (fun g -> g !cached_val new_val) on_change;
+         cached_val := new_val;
+         List.iter (fun (Any p) -> propagate p) parents)
+      else ();
+      if new_val = true then
+        List.iter (fun g -> g ()) when_satisfied
+      else ()
+
 
 let update_term (type j) (t: j formula) (new_val: j) =
   match t with
@@ -109,9 +143,11 @@ let add_parent (type i j) (parent: i formula) (child: j formula) : unit =
   match child with
   | Const _ -> ()
   | Val v -> v.parents <- boxed :: v.parents
+  | ValBool vb -> vb.parents <- boxed :: vb.parents
   | UnaryOp u -> u.parents <- boxed :: u.parents
-  | Comparison c -> c.parents <- boxed :: c.parents
+  | UnaryBool ub -> ub.parents <- boxed :: ub.parents
   | BinOp b -> b.parents <- boxed :: b.parents
+  | BinBool bb -> bb.parents <- boxed :: bb.parents
 
 (* Create a binary operation. *)
 let reg_bin (f: 'k -> 'l -> 'm) =
@@ -125,11 +161,28 @@ let reg_bin (f: 'k -> 'l -> 'm) =
         rhs=rhs;
         cached_val=ref (f (eval lhs) (eval rhs));
         on_change=[];
-        when_satisfied=[]
       } in
     add_parent node lhs;
     add_parent node rhs;
     node
+
+let reg_bin_bool (f: 'k -> 'l -> bool) =
+  fun lhs rhs -> 
+    let node = 
+      BinBool
+      {
+        op=f;
+        parents=[];
+        lhs=lhs;
+        rhs=rhs;
+        cached_val=ref (f (eval lhs) (eval rhs));
+        on_change=[];
+        when_satisfied=[];
+      } in
+    add_parent node lhs;
+    add_parent node rhs;
+    node
+
 
 
 (* Arithmetic functions. *)
@@ -171,30 +224,30 @@ let concat_strings lhs rhs = reg_bin (^) lhs rhs
 let (^) = concat_strings
 
 (* Logical and of boolean formula. *)
-let and_ lhs rhs = reg_bin (&&) lhs rhs
+let and_ lhs rhs = reg_bin_bool (&&) lhs rhs
 let (&&) = and_
 
 (* Logical or of boolean formula *)
-let or_ lhs rhs = reg_bin (||) lhs rhs
+let or_ lhs rhs = reg_bin_bool (||) lhs rhs
 let (||) = or_
 
 (* Equality of two int formulas. *)
-let eq_form lhs rhs = reg_bin (=) lhs rhs
+let eq_form lhs rhs = reg_bin_bool (=) lhs rhs
 let (=) = eq_form
 
-let neq_form lhs rhs = reg_bin (<>) lhs rhs
+let neq_form lhs rhs = reg_bin_bool (<>) lhs rhs
 let (<>) = neq_form
 
-let gt_form lhs rhs = reg_bin (>) lhs rhs
+let gt_form lhs rhs = reg_bin_bool (>) lhs rhs
 let (>) = gt_form
 
-let gte_form lhs rhs = reg_bin (>=) lhs rhs
+let gte_form lhs rhs = reg_bin_bool (>=) lhs rhs
 let (>=) = gte_form
 
-let lt_form lhs rhs = reg_bin (<) lhs rhs
+let lt_form lhs rhs = reg_bin_bool (<) lhs rhs
 let (<) = lt_form
 
-let lte_form lhs rhs = reg_bin (<=) lhs rhs
+let lte_form lhs rhs = reg_bin_bool (<=) lhs rhs
 let (<=) = lte_form
 
 let make_source (): source =
@@ -215,17 +268,21 @@ let on_change : type z. z formula -> (z -> z -> unit) -> unit =
     match f with
     | Const _ -> ()
     | Val v -> v.on_change <- g :: v.on_change
+    | ValBool vb -> vb.on_change <- g :: vb.on_change
     | UnaryOp u -> u.on_change <- g :: u.on_change
-    | Comparison c -> c.on_change <- g :: c.on_change
+    | UnaryBool ub -> ub.on_change <- g :: ub.on_change
     | BinOp b -> b.on_change <- g :: b.on_change
+    | BinBool bb -> bb.on_change <- g :: bb.on_change
 
 let when_satisfied (f: bool formula) (g: unit -> unit) =
   match f with
   | Const _ -> ()
-  | Val v -> v.when_satisfied <- g :: v.when_satisfied
-  | UnaryOp u -> u.when_satisfied <- g :: u.when_satisfied
-  | Comparison c -> c.when_satisfied <- g :: c.when_satisfied
-  | BinOp b -> b.when_satisfied <- g :: b.when_satisfied
+  | Val v -> raise (NotABoolException "Must be applied to ValBool not Val")
+  | ValBool vb -> vb.when_satisfied <- g :: vb.when_satisfied
+  | UnaryOp u -> raise (NotABoolException "Must be applied to UnaryBool not UnaryOp")
+  | UnaryBool ub -> ub.when_satisfied <- g :: ub.when_satisfied
+  | BinOp b -> raise (NotABoolException "Must be applied to BinBool not BinOp")
+  | BinBool bb -> bb.when_satisfied <- g :: bb.when_satisfied
 
 let exec_always (src: source) (s: bool formula) (g: bool -> unit) = src.exec_always <- (s, g) :: src.exec_always
 let exec_while (src: source) (s: bool formula) (g: unit -> unit) = src.exec_while <- (s, g) :: src.exec_while
