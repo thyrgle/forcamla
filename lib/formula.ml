@@ -149,7 +149,39 @@ let add_parent (type i j) (parent: i formula) (child: j formula) : unit =
   | BinOp b -> b.parents <- boxed :: b.parents
   | BinBool bb -> bb.parents <- boxed :: bb.parents
 
-(* Create a binary operation. *)
+(* Create (generic) unary operation. *)
+let reg_unary (f: 'k -> 'm) =
+  fun child -> 
+    let node = 
+      UnaryOp 
+      {
+        op=f;
+        parents=[];
+        child=child;
+        cached_val=ref (f (eval child));
+        on_change=[];
+      } in
+    add_parent node child;
+    node
+
+(* Create (generic) unary operation. *)
+let reg_unary_bool (f: 'k -> bool) =
+  fun child -> 
+    let node = 
+      UnaryBool
+      {
+        op=f;
+        parents=[];
+        child=child;
+        cached_val=ref (f (eval child));
+        on_change=[];
+        when_satisfied=[];
+      } in
+    add_parent node child;
+    node
+
+
+(* Create (generic) binary operation. *)
 let reg_bin (f: 'k -> 'l -> 'm) =
   fun lhs rhs -> 
     let node = 
@@ -166,6 +198,7 @@ let reg_bin (f: 'k -> 'l -> 'm) =
     add_parent node rhs;
     node
 
+(* Create binary operation that returns a bool. *)
 let reg_bin_bool (f: 'k -> 'l -> bool) =
   fun lhs rhs -> 
     let node = 
@@ -182,8 +215,6 @@ let reg_bin_bool (f: 'k -> 'l -> bool) =
     add_parent node lhs;
     add_parent node rhs;
     node
-
-
 
 (* Arithmetic functions. *)
 

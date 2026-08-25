@@ -27,7 +27,17 @@ val (!) : 'e formula -> 'e
 
 (** {2 Register custom operator} *)
 
+(** Register a (generic) unary operation. *)
+val reg_unary : ('r -> 's) -> ('r formula -> 's formula)
+
+(** Register a unary operation that returns a bool. Allows for [when_satisfied] field. *)
+val reg_unary_bool : ('r -> bool) -> ('r formula -> bool formula)
+
+(** Register a (generic) binary operation. *)
 val reg_bin : ('r -> 's -> 't) -> ('r formula -> 's formula -> 't formula)
+
+(** Register a binary operation that returns a bool. Allows for [when_satisfied] field. *)
+val reg_bin_bool : ('r -> 's -> bool) -> ('r formula -> 's formula -> bool formula)
 
 (** {1 Formula creation methods} *)
 
