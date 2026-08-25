@@ -14,7 +14,10 @@ type 'a formula
 *)
 
 (** Lift basic types to term types. *)
-val t : 'c -> 'c formula
+val v : 'c -> 'c formula
+
+(** Create a constant. Cannot be changed, but is more space efficient than a [Val] type. *)
+val c : 'b -> 'b formula
 
 (** {1 Update Term Methods} *)
 

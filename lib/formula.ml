@@ -7,7 +7,7 @@ exception NotABoolException of string
 type any_formula = Any : _ formula -> any_formula
 (* Stores the arithmetic expression of a formula. *)
 and _ formula =
-  Const : { const: 'a; parent: 'b formula} -> 'a formula
+  Const : { const: 'a } -> 'a formula
 | Val : 
   {
     value : 'c ref;
@@ -77,8 +77,11 @@ let rec eval : type h. h formula -> h = function
     | BinBool {op; lhs; rhs; _} -> op (eval lhs) (eval rhs)
 
 (* Construct a formula of a single term. *)
-let t (value: 'n): 'n formula =
+let v (value: 'n): 'n formula =
   Val { parents=[]; value=ref value; on_change=[];}
+
+let c (value: 'a): 'a formula =
+  Const {const = value}
 
 let rec propagate : type i. i formula -> unit = fun f ->
   match f with
