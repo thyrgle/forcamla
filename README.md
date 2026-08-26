@@ -75,6 +75,17 @@ let () = player.health =: !player.health - 1 (* Nothing happens yet! player heal
 let () = player.health =: !player.health - 1 (* Now something happens! player.health is 0 and "Game Over!" is printed to the screen! *)
 ```
 
+# Comparison to Jane Street's Incremental
+
+[Incremental](https://github.com/janestreet/incremental) is a more established library for reactive/self-adjusting computation in OCaml. It's built around explicit `Var.t` and observer nodes — a paradigm similar to [ReactiveX](https://reactivex.io/) — and a lot of engineering effort has gone into making large dependency graphs recompute efficiently.
+
+`forcamla` takes a different angle: ergonomics over raw performance. There's no `Var`/`Observer` split to learn — you write formulas that look like ordinary OCaml values, and most of what you need to know fits on the README. The tradeoff is that forcamla isn't optimized for the kind of large-scale, high-frequency recomputation Incremental is designed for.
+
+Rule of thumb:
+
+- Need battle-tested performance on large computation graphs? Use Incremental.
+- Want something you can pick up in five minutes without learning a new mental model? Use `forcamla`.
+
 ## Documentation
 
 More examples and an API reference can be found [here.](https://rxdt-labs.github.io/forcamla/index.html)
